@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ネザーランドドワーフ 粘土造形 3D構造ビューア</title>
+  <title>ネザーランドドワーフ 粘土造形 3D構造ビューア（精密改訂版）</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Three.js & OrbitControls -->
@@ -24,8 +24,8 @@
       overflow: hidden;
       touch-action: none;
       user-select: none;
+      background-color: #080c14;
     }
-    /* Scrollbars */
     ::-webkit-scrollbar {
       width: 4px;
       height: 4px;
@@ -37,7 +37,6 @@
       background: rgba(100, 116, 139, 0.5);
       border-radius: 9999px;
     }
-    /* 3D Canvas */
     #canvas-container {
       width: 100vw;
       height: 100vh;
@@ -46,7 +45,6 @@
       left: 0;
       z-index: 1;
     }
-    /* Pins Overlay */
     .pin-label {
       position: absolute;
       transform: translate(-50%, -50%);
@@ -57,17 +55,16 @@
     .pin-label:hover {
       transform: translate(-50%, -50%) scale(1.25);
     }
-    /* Glassmorphism */
     .glass-panel {
-      background: rgba(15, 23, 42, 0.88);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(15, 23, 42, 0.90);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
     }
   </style>
 </head>
 
-<body class="bg-slate-950 text-slate-100 min-h-screen w-screen relative overflow-hidden">
+<body class="text-slate-100 min-h-screen w-screen relative overflow-hidden">
 
   <div id="canvas-container"></div>
   <div id="pins-overlay" class="absolute inset-0 pointer-events-none z-10 overflow-hidden"></div>
@@ -80,17 +77,17 @@
       </div>
       <div>
         <h1 class="text-xs md:text-sm font-bold text-white flex items-center gap-1.5">
-          ネザーランドドワーフ 粘土造形ビューア
-          <span class="text-[10px] bg-amber-950/80 text-amber-300 px-1.5 py-0.5 rounded border border-amber-700/50 font-medium">お座り姿勢 3D構造解析</span>
+          ネザーランドドワーフ 粘土造形3D構造解析
+          <span class="text-[10px] bg-emerald-950/90 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-700/50 font-medium">なだらかCカーブ精密版</span>
         </h1>
-        <p class="text-[10px] text-slate-400 hidden sm:block">チンチラ／アグーティ毛色実写に基づく骨格・肉付き・アタリ検証</p>
+        <p class="text-[10px] text-slate-400 hidden sm:block">自然な連続円弧背線・コビー体型・折りたたみ後肢・短マズル</p>
       </div>
     </div>
 
     <!-- Header Actions -->
     <div class="flex items-center space-x-1.5">
       <button id="btn-turntable" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 border border-slate-700 flex items-center gap-1 transition">
-        <svg class="w-3.5 h-3.5 text-amber-400 animate-spin-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+        <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
         <span id="turntable-text" class="text-[11px]">回転: OFF</span>
       </button>
 
@@ -106,7 +103,7 @@
   </header>
 
   <!-- Left Side: Sculptor Controls -->
-  <aside id="sidebar" class="absolute top-14 bottom-3 left-3 z-20 w-72 md:w-80 max-w-[calc(100vw-1.5rem)] flex flex-col gap-2.5 pointer-events-auto transition-transform duration-300">
+  <aside id="sidebar" class="absolute top-14 bottom-3 left-3 z-20 w-72 md:w-80 max-w-[calc(100vw-1.5rem)] flex flex-col gap-2 pointer-events-auto transition-transform duration-300">
     
     <!-- 1. Material Selector -->
     <div class="glass-panel rounded-xl p-3 shadow-xl">
@@ -120,7 +117,7 @@
         </button>
         <button data-mode="clay" class="mat-btn p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-left flex items-center gap-2 transition">
           <span class="w-3 h-3 rounded-full bg-slate-400 shrink-0"></span>
-          <span class="text-[11px]">造形グレー</span>
+          <span class="text-[11px]">造形グレー(サフ)</span>
         </button>
         <button data-mode="terracotta" class="mat-btn p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-left flex items-center gap-2 transition">
           <span class="w-3 h-3 rounded-full bg-amber-700 shrink-0"></span>
@@ -133,18 +130,18 @@
       </div>
 
       <!-- Quick Toggles -->
-      <div class="mt-2.5 pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-300">
+      <div class="mt-2.5 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-300">
         <label class="flex items-center gap-1.5 cursor-pointer hover:text-white">
           <input type="checkbox" id="chk-wire" class="rounded border-slate-700 bg-slate-800 text-amber-500">
           <span>ワイヤ枠</span>
         </label>
         <label class="flex items-center gap-1.5 cursor-pointer hover:text-white">
           <input type="checkbox" id="chk-cushion" checked class="rounded border-slate-700 bg-slate-800 text-amber-500">
-          <span>座布団</span>
+          <span>緑の座布団</span>
         </label>
         <label class="flex items-center gap-1.5 cursor-pointer hover:text-white">
           <input type="checkbox" id="chk-pins" checked class="rounded border-slate-700 bg-slate-800 text-amber-500">
-          <span>構造ピン</span>
+          <span>部位ピン</span>
         </label>
       </div>
     </div>
@@ -152,17 +149,17 @@
     <!-- 2. Camera View Presets -->
     <div class="glass-panel rounded-xl p-3 shadow-xl">
       <div class="text-[11px] font-bold text-amber-400 uppercase tracking-wider mb-2">
-        📷 観察アングル（視点切替）
+        📷 視点切替（シルエット検査）
       </div>
       <div class="grid grid-cols-4 gap-1 text-[11px]">
         <button data-cam="photo" class="cam-btn col-span-2 py-1.5 px-2 rounded bg-amber-950 border border-amber-600/70 text-amber-200 font-bold hover:bg-amber-900 transition flex items-center justify-center gap-1">
-          <span>📸 写真アングル</span>
+          <span>📸 写真アングル (斜め右)</span>
+        </button>
+        <button data-cam="right" class="cam-btn col-span-2 py-1.5 px-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-center font-medium transition">
+          右側面 (Cカーブ検証)
         </button>
         <button data-cam="front" class="cam-btn py-1.5 px-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-center transition">
           正面
-        </button>
-        <button data-cam="right" class="cam-btn py-1.5 px-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-center transition">
-          右側面
         </button>
         <button data-cam="left" class="cam-btn py-1.5 px-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-center transition">
           左側面
@@ -173,31 +170,28 @@
         <button data-cam="rear" class="cam-btn py-1.5 px-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-center transition">
           背面
         </button>
-        <button data-cam="bottom" class="cam-btn py-1.5 px-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-center transition">
-          底面
-        </button>
       </div>
     </div>
 
     <!-- 3. Raking Light & Slicer Controls -->
     <div class="glass-panel rounded-xl p-3 shadow-xl">
       <div class="text-[11px] font-bold text-amber-400 uppercase tracking-wider mb-2 flex items-center justify-between">
-        <span>💡 斜光ライティング検査（凹凸確認）</span>
+        <span>💡 斜光ライティング（曲面の歪み検査）</span>
       </div>
       <div class="space-y-2 text-[11px]">
         <div>
           <div class="flex justify-between text-slate-400 mb-0.5">
-            <span>光源方位角 (回転)</span>
-            <span id="lbl-light-az" class="text-slate-200 font-mono">45°</span>
+            <span>光源回転角 (方位)</span>
+            <span id="lbl-light-az" class="text-slate-200 font-mono">55°</span>
           </div>
-          <input id="slider-light-az" type="range" min="0" max="360" value="45" class="w-full h-1 bg-slate-700 rounded-lg cursor-pointer accent-amber-500">
+          <input id="slider-light-az" type="range" min="0" max="360" value="55" class="w-full h-1 bg-slate-700 rounded-lg cursor-pointer accent-amber-500">
         </div>
         <div>
           <div class="flex justify-between text-slate-400 mb-0.5">
             <span>光源の高さ (仰角)</span>
-            <span id="lbl-light-el" class="text-slate-200 font-mono">30°</span>
+            <span id="lbl-light-el" class="text-slate-200 font-mono">28°</span>
           </div>
-          <input id="slider-light-el" type="range" min="5" max="85" value="30" class="w-full h-1 bg-slate-700 rounded-lg cursor-pointer accent-amber-500">
+          <input id="slider-light-el" type="range" min="5" max="85" value="28" class="w-full h-1 bg-slate-700 rounded-lg cursor-pointer accent-amber-500">
         </div>
         <div class="pt-1.5 border-t border-slate-800 flex items-center justify-between">
           <label class="flex items-center gap-1.5 cursor-pointer text-slate-300">
@@ -213,12 +207,10 @@
     <!-- 4. Anatomical Structure Checklist -->
     <div class="glass-panel rounded-xl p-3 shadow-xl flex-1 flex flex-col min-h-0">
       <div class="text-[11px] font-bold text-amber-400 uppercase tracking-wider mb-1.5 flex items-center justify-between">
-        <span>📋 部位別 造形ポイント</span>
-        <span class="text-[9px] text-slate-400 font-normal">タップで拡大</span>
+        <span>📋 部位別 造形チェックリスト</span>
+        <span class="text-[9px] text-slate-400 font-normal">クリックで拡大</span>
       </div>
-      <div id="anatomy-list" class="space-y-1 overflow-y-auto pr-1 flex-1 text-xs">
-        <!-- Injected via JS -->
-      </div>
+      <div id="anatomy-list" class="space-y-1 overflow-y-auto pr-1 flex-1 text-xs"></div>
     </div>
   </aside>
 
@@ -235,137 +227,134 @@
       <button id="card-close-btn" class="text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800 text-xs">✕</button>
     </div>
     <div class="mt-2 text-xs grid md:grid-cols-2 gap-2 text-slate-300 leading-relaxed">
-      <div id="card-desc" class="bg-slate-950/60 p-2 rounded-lg border border-slate-800 text-[11px]"></div>
-      <div id="card-tip" class="bg-amber-950/40 p-2 rounded-lg border border-amber-800/40 text-amber-200 text-[11px]"></div>
+      <div id="card-desc" class="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800 text-[11px]"></div>
+      <div id="card-tip" class="bg-amber-950/40 p-2.5 rounded-lg border border-amber-800/40 text-amber-200 text-[11px]"></div>
     </div>
   </div>
 
   <!-- Instruction badge -->
   <div id="hint-badge" class="absolute top-14 right-3 z-10 glass-panel text-slate-300 text-[11px] px-3 py-1.5 rounded-full border border-slate-700 pointer-events-none transition-opacity duration-500 flex items-center gap-1.5">
-    <span>🖱️ ドラッグ: 360°回転 | ホイール: ズーム | 右ドラッグ: 平行移動</span>
+    <span>🖱️ ドラッグ: 360°回転 | ホイール: ズーム | 右ドラッグ: 移動</span>
   </div>
 
   <script>
     /* =========================================================================
-       THREE.JS NETHERLAND DWARF RABBIT SCULPTURE VIEWER
+       THREE.JS NETHERLAND DWARF RABBIT SCULPTURE VIEWER (SMOOTH C-CURVE)
        ========================================================================= */
 
     const ANATOMY_ITEMS = [
       {
-        id: 'ear',
+        id: 'back',
         num: 1,
-        name: '耳（短い直立丸耳）',
-        sub: 'Short Erect Rounded Ears',
-        pos: [0.12, 1.62, 0.05],
-        camPos: [1.1, 1.8, 1.2],
-        lookAt: [0.1, 1.45, 0.1],
-        desc: 'ネザーランドドワーフ最大のアイデンティティ。成体でも約5cm以下と非常に短く、頭部頂点で互いに寄り添うように直立。先端は尖らず丸いスプーン状で、縁に黒い毛のラインが入ります。',
-        tip: '【粘土造形】頭部球体に対して耳を長くしすぎないこと。耳の高さは頭部全高の約0.4〜0.45倍が黄金比です。'
+        name: '背中の滑らかな連続Cカーブ',
+        sub: 'Smooth Continuous Cobby Spine Line',
+        pos: [0.0, 0.98, -0.05],
+        camPos: [2.5, 0.85, 0.0],
+        lookAt: [0.0, 0.70, 0.0],
+        desc: '腰の不自然なコブや段差を排し、うなじから肩、背中中央、腰、臀部（お尻）までが滑らかで一体的な半円弧を描くネザーランドドワーフ特有のコビー背線です。',
+        tip: '【粘土造形】真横（右側面）から観察し、背骨のラインを1本の滑らかな半円弧としてヘラで整えます。ボリュームは上へ盛り上げるのではなく、太もも・脇腹への左右の広がりに割り振ります。'
+      },
+      {
+        id: 'ear',
+        num: 2,
+        name: '耳（極めて短い直立スプーン耳）',
+        sub: 'Short Upright Rounded Spoon Ears',
+        pos: [0.10, 1.48, 0.06],
+        camPos: [1.1, 1.6, 1.1],
+        lookAt: [0.08, 1.35, 0.1],
+        desc: '成体でも約5cm以下と非常に短く、頭頂部でほぼ平行に寄り添うように直立。先端は尖らず丸いスプーン状で、外縁に黒い毛の引き締まったパイピングが入ります。',
+        tip: '【粘土造形】耳の長さは頭部全高の約0.4倍が黄金比。長くしすぎると別の品種に見えてしまうため、短く丸く厚みを持たせます。'
       },
       {
         id: 'head',
-        num: 2,
+        num: 3,
         name: '頭部・短マズル（球状の丸頭）',
         sub: 'Spherical Compact Skull & Flat Face',
-        pos: [0.26, 1.25, 0.42],
-        camPos: [1.3, 1.35, 1.2],
-        lookAt: [0.05, 1.2, 0.3],
-        desc: '横から見るとほぼきれいな円を描く、極めて短く詰まったマズル（鼻口部）。額から鼻先にかけての凹凸（ストップ）が平坦で、愛らしいおまんじゅう型です。',
-        tip: '【粘土造形】芯材の段階でアルミホイルを真球に近い形に固めます。犬猫のような鼻先の突き出しは作らず、丸い頭に平たく鼻口部を埋め込みます。'
+        pos: [0.22, 1.12, 0.40],
+        camPos: [1.2, 1.2, 1.1],
+        lookAt: [0.0, 1.08, 0.28],
+        desc: '横から見ても正面から見ても丸い、極めて短く詰まったマズル。額から鼻先にかけての凹凸（ストップ）が平坦で、愛らしいお団子型です。',
+        tip: '【粘土造形】アルミホイル芯はほぼ完全な球体にし、鼻口部の突き出しは最小限（平らな小丘程度）に抑えます。'
       },
       {
         id: 'cheek',
-        num: 3,
+        num: 4,
         name: '頬袋・ほっぺ（下膨れのふくらみ）',
         sub: 'Plump Zygomatic Cheek Pads',
-        pos: [0.38, 1.12, 0.30],
-        camPos: [1.2, 1.1, 1.0],
-        lookAt: [0.0, 1.1, 0.2],
+        pos: [0.32, 1.0, 0.26],
+        camPos: [1.1, 0.95, 0.9],
+        lookAt: [0.0, 1.0, 0.2],
         desc: '正面から見たときに横へ大きく張り出す豊かな頬毛のボリューム。首の境界を隠すほど膨らみ、正面シルエットをおにぎり型に見せています。',
-        tip: '【粘土造形】目の斜め下からアゴにかけて左右均等に粘土玉を盛り、頭の球体とスムーズに繋ぎ合わせて下膨れを作ります。'
+        tip: '【粘土造形】目の斜め下からアゴにかけて左右均等に粘土玉を盛り、頭の球体と滑らかに馴染ませて下膨れを作ります。'
       },
       {
         id: 'eye',
-        num: 4,
+        num: 5,
         name: '大きな黒目（側面に張り出す球体）',
         sub: 'Bulbous Dark Eyes & Lighter Eye Ring',
-        pos: [0.32, 1.28, 0.28],
-        camPos: [0.8, 1.35, 0.8],
-        lookAt: [0.2, 1.25, 0.2],
+        pos: [0.27, 1.14, 0.24],
+        camPos: [0.8, 1.25, 0.8],
+        lookAt: [0.18, 1.12, 0.18],
         desc: '頭部側面に半球状に飛び出す漆黒の瞳。周囲に淡いアイリング毛があり、立体的な瞳の丸みが強調されます。',
         tip: '【粘土造形】市販の黒ガラスカボションやオニキスビーズを埋め込むか、造形後にUVレジンを盛ると濡れたような瑞々しい輝きが再現できます。'
       },
       {
         id: 'chest',
-        num: 5,
+        num: 6,
         name: '首なしマフラー・胸元の肉付き',
         sub: 'Dewlap & Neckless Seamless Chest',
-        pos: [0.15, 0.85, 0.42],
-        camPos: [1.3, 0.9, 1.2],
-        lookAt: [0.0, 0.8, 0.25],
+        pos: [0.12, 0.76, 0.38],
+        camPos: [1.2, 0.8, 1.1],
+        lookAt: [0.0, 0.72, 0.22],
         desc: '首のくびれが外見上ほとんどなく、アゴ下からそのまま豊かな胸元の白毛へと繋がります。マフラーを巻いたような丸みがあります。',
         tip: '【粘土造形】頭部と胴体を接合する際、アゴ下の隙間をしっかり粘土で埋め、首を作らずなだらかなスロープで胸へと繋げます。'
-      },
-      {
-        id: 'back',
-        num: 6,
-        name: '背中の急激なCカーブ（ハイアーチ）',
-        sub: 'Prominent High-Arched Dorsal Curve',
-        pos: [-0.02, 1.22, -0.15],
-        camPos: [1.9, 1.3, -0.2],
-        lookAt: [0.0, 0.9, -0.05],
-        desc: '首の後ろから腰・お尻へと一気に立ち上がる、美しい半円状の弧（ハイアーチ）。お座り時のネザーランド特有の「お団子シルエット」の要です。',
-        tip: '【粘土造形】右側面（真横）から透かして見て、背中の最も高い部分が頭頂部とほぼ同じかやや高くなるように盛り上げます。'
       },
       {
         id: 'thigh',
         num: 7,
         name: '折りたたまれた太もも（大腿部の塊）',
         sub: 'Tucked Massive Hindquarters',
-        pos: [0.38, 0.52, -0.1],
-        camPos: [1.4, 0.65, 0.2],
-        lookAt: [0.1, 0.5, -0.1],
+        pos: [0.35, 0.44, -0.08],
+        camPos: [1.4, 0.55, 0.2],
+        lookAt: [0.1, 0.42, -0.08],
         desc: 'お座り姿勢では力強い後足が胴体の両サイドに完全に折りたたまれ、大きな半球状の肉塊となってお座りの安定した土台を形成します。',
-        tip: '【粘土造形】胴体中心の卵型芯材の両脇に、大きめの粘土の塊を「太もも」として左右対称に貼り付けて一体化させます。'
+        tip: '【粘土造形】胴体中心の芯材の両脇に、大きめの粘土の塊を「太もも」として左右対称に貼り付けて一体化させます。'
       },
       {
         id: 'foreleg',
         num: 8,
         name: '垂直に揃えた前足',
         sub: 'Parallel Upright Forelegs',
-        pos: [0.12, 0.25, 0.35],
-        camPos: [0.9, 0.35, 1.3],
-        lookAt: [0.05, 0.25, 0.3],
+        pos: [0.09, 0.22, 0.30],
+        camPos: [0.8, 0.30, 1.1],
+        lookAt: [0.05, 0.22, 0.25],
         desc: '胸の真下から地面に向かって2本が平行に真っ直ぐ伸びる前足。足先は座布団の上にちょこんと前向きに接地します。',
         tip: '【粘土造形】前足を長く作りすぎると立位ポーズになってしまいます。短めに抑え、胴体底面と座布団との隙間を小さくします。'
       }
     ];
 
-    // Block-in color coding
     const BLOCK_COLORS = {
-      head: 0xff6b6b,     // Coral Red
-      cheeks: 0xff8e8e,   // Light Coral
-      ears: 0xffd166,     // Yellow Gold
-      eyes: 0x1e293b,     // Dark Slate
-      torso: 0x4cc9f0,    // Sky Blue
-      chest: 0x4895ef,    // Royal Blue
-      thighs: 0xf77f00,   // Amber Orange
-      forelegs: 0x06d6a0, // Mint Green
-      feet: 0x118ab2,     // Ocean Blue
-      tail: 0x9d4edd,     // Purple
-      cushion: 0x468739   // Green
+      head: 0xff6b6b,
+      cheeks: 0xff8e8e,
+      ears: 0xffd166,
+      eyes: 0x1e293b,
+      torso: 0x4cc9f0,
+      chest: 0x4895ef,
+      thighs: 0xf77f00,
+      forelegs: 0x06d6a0,
+      feet: 0x118ab2,
+      tail: 0x9d4edd,
+      cushion: 0x468739
     };
 
     const container = document.getElementById('canvas-container');
     const pinsOverlay = document.getElementById('pins-overlay');
 
-    // 1. Scene & Camera Setup
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0a0f1d);
 
     const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 50);
-    // Initial camera position matches the photo perspective (diagonal right-front)
-    camera.position.set(2.2, 1.5, 2.1);
+    camera.position.set(2.0, 1.35, 1.9);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true, powerPreference: 'high-performance' });
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -378,18 +367,16 @@
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.06;
-    controls.maxDistance = 6.0;
+    controls.maxDistance = 5.5;
     controls.minDistance = 0.8;
-    controls.target.set(0, 0.82, 0.1);
+    controls.target.set(0, 0.72, 0.08);
     controls.update();
 
-    // 2. Lighting Setup
-    const ambientLight = new THREE.AmbientLight(0xdce7f5, 0.7);
+    const ambientLight = new THREE.AmbientLight(0xdce7f5, 0.75);
     scene.add(ambientLight);
 
-    // Sculptor Key Light (Directional, movable)
-    const keyLight = new THREE.DirectionalLight(0xfff6ea, 1.35);
-    keyLight.position.set(2.4, 2.0, 2.4);
+    const keyLight = new THREE.DirectionalLight(0xfff7ed, 1.4);
+    keyLight.position.set(2.5, 2.0, 2.2);
     keyLight.castShadow = true;
     keyLight.shadow.mapSize.width = 2048;
     keyLight.shadow.mapSize.height = 2048;
@@ -400,21 +387,18 @@
     keyLight.shadow.camera.right = shadowD;
     keyLight.shadow.camera.top = shadowD;
     keyLight.shadow.camera.bottom = -shadowD;
-    keyLight.shadow.bias = -0.0004;
+    keyLight.shadow.bias = -0.0003;
     scene.add(keyLight);
 
-    // Cool fill light from opposite side
-    const fillLight = new THREE.DirectionalLight(0x93c5fd, 0.45);
-    fillLight.position.set(-2.2, 1.4, -1.8);
+    const fillLight = new THREE.DirectionalLight(0x93c5fd, 0.5);
+    fillLight.position.set(-2.2, 1.3, -1.8);
     scene.add(fillLight);
 
-    // Green bounce reflection from the cushion
     const bounceLight = new THREE.DirectionalLight(0x86efac, 0.25);
     bounceLight.position.set(0, -2, 0);
     scene.add(bounceLight);
 
-    // Slicer horizontal clipping plane
-    const clipPlane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 5.0); // initially unclipped
+    const clipPlane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 5.0);
 
     function createChinchillaFurTexture() {
       const c = document.createElement('canvas');
@@ -422,28 +406,25 @@
       c.height = 512;
       const ctx = c.getContext('2d');
 
-      // Base coat: soft medium grey
       ctx.fillStyle = '#8e9399';
       ctx.fillRect(0, 0, 512, 512);
 
-      // Fine salt-and-pepper agouti hair specks
-      for (let i = 0; i < 40000; i++) {
+      for (let i = 0; i < 42000; i++) {
         const x = Math.random() * 512;
         const y = Math.random() * 512;
         const r = Math.random();
-        if (r < 0.35) {
-          ctx.fillStyle = 'rgba(25, 28, 35, 0.45)'; // dark guard hair
-        } else if (r < 0.72) {
-          ctx.fillStyle = 'rgba(245, 247, 250, 0.55)'; // silver hair
+        if (r < 0.36) {
+          ctx.fillStyle = 'rgba(25, 28, 35, 0.48)';
+        } else if (r < 0.74) {
+          ctx.fillStyle = 'rgba(245, 247, 250, 0.55)';
         } else {
-          ctx.fillStyle = 'rgba(165, 155, 140, 0.35)'; // warm agouti brown undertone
+          ctx.fillStyle = 'rgba(165, 155, 140, 0.35)';
         }
         ctx.fillRect(x, y, 1.2, 1.2);
       }
 
-      // Soft vertical fur directional streaks
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.07)';
-      for (let i = 0; i < 70; i++) {
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+      for (let i = 0; i < 80; i++) {
         const x = Math.random() * 512;
         ctx.fillRect(x, 0, Math.random() * 3 + 1, 512);
       }
@@ -457,25 +438,24 @@
 
     const furTex = createChinchillaFurTexture();
 
-    // Material Library
     const mats = {
       fur: {
         body: new THREE.MeshStandardMaterial({
           map: furTex,
-          color: 0x9fa4a9,
-          roughness: 0.85,
-          metalness: 0.03,
+          color: 0xa4a9af,
+          roughness: 0.88,
+          metalness: 0.02,
           clippingPlanes: [clipPlane],
           clipShadows: true
         }),
         white: new THREE.MeshStandardMaterial({
-          color: 0xedf0f5,
-          roughness: 0.9,
+          color: 0xf1f3f7,
+          roughness: 0.92,
           clippingPlanes: [clipPlane]
         }),
         earInner: new THREE.MeshStandardMaterial({
-          color: 0xdfbcba,
-          roughness: 0.92,
+          color: 0xd8b5b3,
+          roughness: 0.94,
           clippingPlanes: [clipPlane]
         }),
         earRim: new THREE.MeshStandardMaterial({
@@ -485,14 +465,14 @@
         }),
         eye: new THREE.MeshPhysicalMaterial({
           color: 0x05070a,
-          roughness: 0.04,
+          roughness: 0.03,
           metalness: 0.1,
           transmission: 0.05,
           clearcoat: 1.0,
-          clearcoatRoughness: 0.05
+          clearcoatRoughness: 0.04
         }),
         eyeRing: new THREE.MeshStandardMaterial({
-          color: 0xd8dde4,
+          color: 0xdde2ea,
           roughness: 0.9
         }),
         nose: new THREE.MeshStandardMaterial({
@@ -529,7 +509,6 @@
       blockin: {}
     };
 
-    // Populate Block-in materials
     for (let k in BLOCK_COLORS) {
       mats.blockin[k] = new THREE.MeshStandardMaterial({
         color: BLOCK_COLORS[k],
@@ -539,7 +518,6 @@
       });
     }
 
-    // List of all rabbit meshes for material swapping
     const rabbitMeshRegistry = [];
 
     function registerMesh(mesh, category) {
@@ -552,107 +530,97 @@
     const rabbitRoot = new THREE.Group();
     scene.add(rabbitRoot);
 
-    /* 1. TORSO (Compact, rounded sitting egg volume with prominent C-curve back) */
     const torsoG = new THREE.Group();
-    torsoG.position.set(0, 0.72, -0.05);
-    torsoG.rotation.x = -0.32; // tilted sitting angle
+    torsoG.position.set(0, 0.62, -0.02);
+    torsoG.rotation.x = -0.26;
     rabbitRoot.add(torsoG);
 
-    // Main torso sphere scaled into an egg
+    // Primary torso: seamless, organic single ellipsoid
     const torsoMesh = new THREE.Mesh(
-      new THREE.SphereGeometry(0.55, 36, 32),
+      new THREE.SphereGeometry(0.53, 40, 36),
       mats.fur.body
     );
-    torsoMesh.scale.set(0.92, 1.15, 1.28);
+    torsoMesh.scale.set(0.92, 1.16, 1.26);
     registerMesh(torsoMesh, 'torso');
     torsoG.add(torsoMesh);
 
-    // Dorsal hump mesh to form the smooth high C-curve spine
-    const backHump = new THREE.Mesh(
-      new THREE.SphereGeometry(0.46, 32, 28),
+    // Gentle, smooth dorsal thoracic arch (no localized waist hump)
+    const smoothArch = new THREE.Mesh(
+      new THREE.SphereGeometry(0.48, 36, 32),
       mats.fur.body
     );
-    backHump.position.set(0, 0.22, -0.18);
-    backHump.scale.set(0.85, 1.05, 1.1);
-    registerMesh(backHump, 'torso');
-    torsoG.add(backHump);
+    smoothArch.position.set(0, 0.12, -0.06);
+    smoothArch.scale.set(0.86, 0.98, 1.14);
+    registerMesh(smoothArch, 'torso');
+    torsoG.add(smoothArch);
 
-    /* 2. CHEST & DEWLAP (Continuous neckless volume) */
     const chestMesh = new THREE.Mesh(
-      new THREE.SphereGeometry(0.38, 32, 28),
+      new THREE.SphereGeometry(0.36, 36, 32),
       mats.fur.body
     );
-    chestMesh.position.set(0, 0.76, 0.26);
-    chestMesh.scale.set(0.9, 1.05, 0.95);
-    chestMesh.rotation.x = 0.2;
+    chestMesh.position.set(0, 0.68, 0.24);
+    chestMesh.scale.set(0.92, 1.02, 0.94);
+    chestMesh.rotation.x = 0.18;
     registerMesh(chestMesh, 'chest');
     rabbitRoot.add(chestMesh);
 
-    // Pale fur bib on chest
     const chestBib = new THREE.Mesh(
-      new THREE.SphereGeometry(0.32, 28, 24),
+      new THREE.SphereGeometry(0.31, 32, 28),
       mats.fur.white
     );
-    chestBib.position.set(0, 0.70, 0.42);
-    chestBib.scale.set(0.72, 0.95, 0.45);
+    chestBib.position.set(0, 0.64, 0.39);
+    chestBib.scale.set(0.72, 0.92, 0.46);
     registerMesh(chestBib, 'chest');
     rabbitRoot.add(chestBib);
 
-    /* 3. HEAD GROUP (Compact round skull, full cheeks, short muzzle) */
     const headG = new THREE.Group();
-    headG.position.set(0, 1.24, 0.22);
+    headG.position.set(0, 1.10, 0.20);
     rabbitRoot.add(headG);
 
-    // Round head sphere
     const headMesh = new THREE.Mesh(
-      new THREE.SphereGeometry(0.38, 36, 32),
+      new THREE.SphereGeometry(0.35, 40, 36),
       mats.fur.body
     );
-    headMesh.scale.set(0.95, 0.92, 1.02);
+    headMesh.scale.set(0.96, 0.92, 1.0);
     registerMesh(headMesh, 'head');
     headG.add(headMesh);
 
-    // Chubby Full Cheeks (Right & Left)
-    const cheekGeo = new THREE.SphereGeometry(0.24, 28, 24);
-    cheekGeo.scale(1.1, 0.88, 1.0);
+    const cheekGeo = new THREE.SphereGeometry(0.22, 32, 28);
+    cheekGeo.scale(1.15, 0.88, 1.0);
 
     const rightCheek = new THREE.Mesh(cheekGeo, mats.fur.body);
-    rightCheek.position.set(0.22, -0.1, 0.08);
+    rightCheek.position.set(0.20, -0.08, 0.08);
     registerMesh(rightCheek, 'cheeks');
     headG.add(rightCheek);
 
     const leftCheek = new THREE.Mesh(cheekGeo, mats.fur.body);
-    leftCheek.position.set(-0.22, -0.1, 0.08);
+    leftCheek.position.set(-0.20, -0.08, 0.08);
     registerMesh(leftCheek, 'cheeks');
     headG.add(leftCheek);
 
-    // Short Muzzle & Whisker pads
     const muzzleMesh = new THREE.Mesh(
-      new THREE.SphereGeometry(0.18, 28, 24),
+      new THREE.SphereGeometry(0.16, 28, 24),
       mats.fur.body
     );
-    muzzleMesh.position.set(0, -0.12, 0.28);
-    muzzleMesh.scale.set(0.9, 0.8, 1.08);
+    muzzleMesh.position.set(0, -0.10, 0.27);
+    muzzleMesh.scale.set(0.92, 0.8, 1.05);
     registerMesh(muzzleMesh, 'head');
     headG.add(muzzleMesh);
 
-    // Little dark nose
     const noseMesh = new THREE.Mesh(
-      new THREE.SphereGeometry(0.045, 16, 16),
+      new THREE.SphereGeometry(0.04, 16, 16),
       mats.fur.nose
     );
-    noseMesh.position.set(0, -0.06, 0.45);
+    noseMesh.position.set(0, -0.05, 0.42);
     noseMesh.scale.set(1.0, 0.7, 0.7);
     registerMesh(noseMesh, 'head');
     headG.add(noseMesh);
 
-    /* 4. LARGE BULBOUS EYES (Lateral facing) */
-    const eyeGeo = new THREE.SphereGeometry(0.082, 28, 28);
-    const ringGeo = new THREE.TorusGeometry(0.084, 0.012, 16, 32);
+    const eyeGeo = new THREE.SphereGeometry(0.078, 28, 28);
+    const ringGeo = new THREE.TorusGeometry(0.079, 0.011, 16, 32);
 
-    // Right Eye & Ring
     const rightEye = new THREE.Mesh(eyeGeo, mats.fur.eye);
-    rightEye.position.set(0.30, 0.07, 0.12);
+    rightEye.position.set(0.28, 0.06, 0.11);
     registerMesh(rightEye, 'eyes');
     headG.add(rightEye);
 
@@ -662,9 +630,8 @@
     registerMesh(rightRing, 'eyes');
     headG.add(rightRing);
 
-    // Left Eye & Ring
     const leftEye = new THREE.Mesh(eyeGeo, mats.fur.eye);
-    leftEye.position.set(-0.30, 0.07, 0.12);
+    leftEye.position.set(-0.28, 0.06, 0.11);
     registerMesh(leftEye, 'eyes');
     headG.add(leftEye);
 
@@ -674,135 +641,121 @@
     registerMesh(leftRing, 'eyes');
     headG.add(leftRing);
 
-    /* 5. SHORT ERECT EARS (Solid, smooth rounded spoons) */
     function buildEar(isRight) {
       const ear = new THREE.Group();
       const sign = isRight ? 1 : -1;
 
-      // Outer ear curved body
       const outerMesh = new THREE.Mesh(
-        new THREE.SphereGeometry(0.13, 24, 24),
+        new THREE.SphereGeometry(0.12, 28, 24),
         mats.fur.body
       );
-      outerMesh.scale.set(0.7, 1.85, 0.45);
-      outerMesh.position.set(0, 0.22, 0);
+      outerMesh.scale.set(0.7, 1.8, 0.42);
+      outerMesh.position.set(0, 0.20, 0);
       registerMesh(outerMesh, 'ears');
       ear.add(outerMesh);
 
-      // Inner concave cavity (pinkish fur)
       const innerMesh = new THREE.Mesh(
-        new THREE.SphereGeometry(0.11, 20, 20),
+        new THREE.SphereGeometry(0.10, 24, 20),
         mats.fur.earInner
       );
-      innerMesh.scale.set(0.55, 1.6, 0.3);
-      innerMesh.position.set(0, 0.21, 0.035);
+      innerMesh.scale.set(0.55, 1.55, 0.28);
+      innerMesh.position.set(0, 0.19, 0.032);
       registerMesh(innerMesh, 'ears');
       ear.add(innerMesh);
 
-      // Dark fur piping along the top edge
       const tipMesh = new THREE.Mesh(
-        new THREE.SphereGeometry(0.088, 16, 16),
+        new THREE.SphereGeometry(0.082, 20, 16),
         mats.fur.earRim
       );
-      tipMesh.scale.set(0.68, 0.5, 0.42);
-      tipMesh.position.set(0, 0.41, 0);
+      tipMesh.scale.set(0.68, 0.48, 0.4);
+      tipMesh.position.set(0, 0.38, 0);
       registerMesh(tipMesh, 'ears');
       ear.add(tipMesh);
 
-      // Positioning on the skull: short, erect, slight V-angle
-      ear.position.set(sign * 0.12, 0.32, -0.05);
-      ear.rotation.z = sign * -0.15; // subtle V-spread
-      ear.rotation.x = -0.08;
-      ear.rotation.y = sign * 0.12;
+      ear.position.set(sign * 0.10, 0.29, -0.04);
+      ear.rotation.z = sign * -0.14;
+      ear.rotation.x = -0.06;
+      ear.rotation.y = sign * 0.10;
       return ear;
     }
     headG.add(buildEar(true));
     headG.add(buildEar(false));
 
-    /* 6. TUCKED THIGHS (Massive lateral hindquarter volumes) */
-    const thighGeo = new THREE.SphereGeometry(0.42, 32, 28);
-    thighGeo.scale(0.65, 0.95, 1.25);
+    const thighGeo = new THREE.SphereGeometry(0.39, 32, 28);
+    thighGeo.scale(0.64, 0.94, 1.20);
 
     const rightThigh = new THREE.Mesh(thighGeo, mats.fur.body);
-    rightThigh.position.set(0.36, 0.46, -0.12);
-    rightThigh.rotation.set(-0.25, 0.12, 0.2);
+    rightThigh.position.set(0.34, 0.40, -0.10);
+    rightThigh.rotation.set(-0.22, 0.12, 0.18);
     registerMesh(rightThigh, 'thighs');
     rabbitRoot.add(rightThigh);
 
     const leftThigh = new THREE.Mesh(thighGeo, mats.fur.body);
-    leftThigh.position.set(-0.36, 0.46, -0.12);
-    leftThigh.rotation.set(-0.25, -0.12, -0.2);
+    leftThigh.position.set(-0.34, 0.40, -0.10);
+    leftThigh.rotation.set(-0.22, -0.12, -0.18);
     registerMesh(leftThigh, 'thighs');
     rabbitRoot.add(leftThigh);
 
-    /* 7. FORELEGS & FRONT PAWS (Vertical upright parallel pillars) */
     function buildForeleg(isRight) {
       const leg = new THREE.Group();
       const sign = isRight ? 1 : -1;
 
-      // Leg pillar
       const legMesh = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.08, 0.09, 0.38, 24),
+        new THREE.CylinderGeometry(0.075, 0.085, 0.35, 24),
         mats.fur.body
       );
-      legMesh.position.y = 0.19;
+      legMesh.position.y = 0.175;
       registerMesh(legMesh, 'forelegs');
       leg.add(legMesh);
 
-      // Front paw
       const pawMesh = new THREE.Mesh(
-        new THREE.SphereGeometry(0.1, 20, 18),
+        new THREE.SphereGeometry(0.092, 24, 20),
         mats.fur.white
       );
-      pawMesh.position.set(0, 0.05, 0.07);
-      pawMesh.scale.set(0.85, 0.55, 1.35);
+      pawMesh.position.set(0, 0.045, 0.065);
+      pawMesh.scale.set(0.85, 0.52, 1.32);
       registerMesh(pawMesh, 'forelegs');
       leg.add(pawMesh);
 
-      leg.position.set(sign * 0.11, 0.04, 0.32);
-      leg.rotation.x = -0.05;
+      leg.position.set(sign * 0.10, 0.04, 0.30);
+      leg.rotation.x = -0.04;
       return leg;
     }
     rabbitRoot.add(buildForeleg(true));
     rabbitRoot.add(buildForeleg(false));
 
-    // Hind toes peeking beside front paws
-    const hindFootGeo = new THREE.SphereGeometry(0.09, 20, 16);
-    hindFootGeo.scale(0.88, 0.5, 1.4);
+    const hindFootGeo = new THREE.SphereGeometry(0.085, 20, 16);
+    hindFootGeo.scale(0.86, 0.48, 1.35);
 
     const rightHindFoot = new THREE.Mesh(hindFootGeo, mats.fur.white);
-    rightHindFoot.position.set(0.29, 0.045, 0.22);
-    rightHindFoot.rotation.y = 0.22;
+    rightHindFoot.position.set(0.27, 0.042, 0.20);
+    rightHindFoot.rotation.y = 0.20;
     registerMesh(rightHindFoot, 'feet');
     rabbitRoot.add(rightHindFoot);
 
     const leftHindFoot = new THREE.Mesh(hindFootGeo, mats.fur.white);
-    leftHindFoot.position.set(-0.29, 0.045, 0.22);
-    leftHindFoot.rotation.y = -0.22;
+    leftHindFoot.position.set(-0.27, 0.042, 0.20);
+    leftHindFoot.rotation.y = -0.20;
     registerMesh(leftHindFoot, 'feet');
     rabbitRoot.add(leftHindFoot);
 
-    /* 8. TAIL (Compact upright fluffy ball) */
     const tailMesh = new THREE.Mesh(
-      new THREE.SphereGeometry(0.13, 24, 20),
+      new THREE.SphereGeometry(0.12, 24, 20),
       mats.fur.white
     );
-    tailMesh.position.set(0, 0.42, -0.66);
-    tailMesh.scale.set(0.8, 1.1, 0.9);
-    tailMesh.rotation.x = 0.35;
+    tailMesh.position.set(0, 0.36, -0.62);
+    tailMesh.scale.set(0.8, 1.1, 0.88);
+    tailMesh.rotation.x = 0.32;
     registerMesh(tailMesh, 'tail');
     rabbitRoot.add(tailMesh);
 
-    /* 9. GREEN LEAF CUSHION PAD (Reference Photo Grounding Mat) */
     const cushionGroup = new THREE.Group();
-    cushionGroup.position.set(0, 0, 0);
     scene.add(cushionGroup);
 
-    // Oval green cushion
     const cushionMesh = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.96, 1.05, 0.09, 42),
+      new THREE.CylinderGeometry(0.96, 1.05, 0.09, 44),
       new THREE.MeshStandardMaterial({
-        color: 0x3f8a32,
+        color: 0x3e8a31,
         roughness: 0.85,
         metalness: 0.02
       })
@@ -812,17 +765,15 @@
     cushionMesh.receiveShadow = true;
     cushionGroup.add(cushionMesh);
 
-    // Cushion rolled border rim
     const seamMesh = new THREE.Mesh(
-      new THREE.TorusGeometry(0.98, 0.025, 16, 42),
-      new THREE.MeshStandardMaterial({ color: 0x2e6524, roughness: 0.9 })
+      new THREE.TorusGeometry(0.98, 0.025, 16, 44),
+      new THREE.MeshStandardMaterial({ color: 0x2c6422, roughness: 0.9 })
     );
     seamMesh.rotateX(Math.PI / 2);
     seamMesh.scale.set(1.0, 1.25, 1.0);
     seamMesh.position.y = -0.02;
     cushionGroup.add(seamMesh);
 
-    // Workshop Grid underneath
     const grid = new THREE.GridHelper(5, 20, 0xf59e0b, 0x1e293b);
     grid.position.y = -0.091;
     scene.add(grid);
@@ -846,7 +797,6 @@
       });
     });
 
-    // Populate Sidebar Anatomy List
     const anatomyList = document.getElementById('anatomy-list');
     ANATOMY_ITEMS.forEach(item => {
       const row = document.createElement('button');
@@ -864,9 +814,8 @@
       anatomyList.appendChild(row);
     });
 
-    // Smooth Camera Animation helper
     let isTweening = false;
-    function smoothMoveCamera(camTargetPos, lookAtPos, duration = 900) {
+    function smoothMoveCamera(camTargetPos, lookAtPos, duration = 850) {
       isTweening = true;
       const startPos = camera.position.clone();
       const endPos = new THREE.Vector3(...camTargetPos);
@@ -877,7 +826,6 @@
       function step(now) {
         const elapsed = now - startTime;
         let t = Math.min(1, elapsed / duration);
-        // Cubic ease in-out
         t = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
         camera.position.lerpVectors(startPos, endPos, t);
@@ -893,7 +841,6 @@
       requestAnimationFrame(step);
     }
 
-    // Detail Card Controls
     const pinCard = document.getElementById('pin-card');
     const cardNum = document.getElementById('card-num');
     const cardName = document.getElementById('card-name');
@@ -917,7 +864,6 @@
       pinCard.classList.add('translate-y-36', 'opacity-0', 'pointer-events-none');
     });
 
-    // Material Switcher Logic
     const matButtons = document.querySelectorAll('.mat-btn');
     matButtons.forEach(btn => {
       btn.addEventListener('click', () => {
@@ -939,8 +885,8 @@
         let mat;
         if (mode === 'fur') {
           if (category === 'eyes') mat = mats.fur.eye;
-          else if (category === 'ears' && mesh.geometry.parameters && mesh.geometry.parameters.radius === 0.11) mat = mats.fur.earInner;
-          else if (category === 'ears' && mesh.geometry.parameters && mesh.geometry.parameters.radius === 0.088) mat = mats.fur.earRim;
+          else if (category === 'ears' && mesh.geometry.parameters && mesh.geometry.parameters.radius === 0.10) mat = mats.fur.earInner;
+          else if (category === 'ears' && mesh.geometry.parameters && mesh.geometry.parameters.radius === 0.082) mat = mats.fur.earRim;
           else if (category === 'tail' || mesh === chestBib || category === 'feet') mat = mats.fur.white;
           else if (mesh === noseMesh) mat = mats.fur.nose;
           else mat = mats.fur.body;
@@ -958,7 +904,6 @@
       });
     }
 
-    // Checkbox toggles
     document.getElementById('chk-wire').addEventListener('change', (e) => {
       rabbitMeshRegistry.forEach(({ mesh }) => {
         mesh.material.wireframe = e.target.checked;
@@ -973,15 +918,13 @@
       pinsOverlay.style.display = e.target.checked ? 'block' : 'none';
     });
 
-    // Camera Presets
     const CAM_PRESETS = {
-      photo:  { pos: [2.2, 1.5, 2.1],  target: [0, 0.82, 0.1] },  // matches the 3/4 right photo
-      front:  { pos: [0, 1.1, 2.7],    target: [0, 0.85, 0.15] },
-      right:  { pos: [2.7, 0.95, 0],   target: [0, 0.80, 0] },    // Profile C-curve
-      left:   { pos: [-2.7, 0.95, 0],  target: [0, 0.80, 0] },
-      top:    { pos: [0, 3.2, 0.05],   target: [0, 0.6, 0] },     // Egg silhouette
-      rear:   { pos: [0, 0.95, -2.7],  target: [0, 0.75, -0.1] },
-      bottom: { pos: [0, -2.5, 0.1],   target: [0, 0.4, 0] }
+      photo:  { pos: [2.0, 1.35, 1.9],  target: [0, 0.72, 0.08] },
+      right:  { pos: [2.5, 0.85, 0],    target: [0, 0.70, 0] },
+      front:  { pos: [0, 0.98, 2.5],    target: [0, 0.74, 0.12] },
+      left:   { pos: [-2.5, 0.85, 0],   target: [0, 0.70, 0] },
+      top:    { pos: [0, 3.0, 0.02],    target: [0, 0.55, 0] },
+      rear:   { pos: [0, 0.85, -2.5],   target: [0, 0.65, -0.1] }
     };
 
     document.querySelectorAll('.cam-btn').forEach(btn => {
@@ -991,7 +934,6 @@
       });
     });
 
-    // Turntable Auto-Rotate
     let isAutoRotating = false;
     const btnTurntable = document.getElementById('btn-turntable');
     const turntableText = document.getElementById('turntable-text');
@@ -1004,7 +946,6 @@
       btnTurntable.classList.toggle('text-amber-400', isAutoRotating);
     });
 
-    // Sculptor Raking Light Sliders
     const slAz = document.getElementById('slider-light-az');
     const slEl = document.getElementById('slider-light-el');
     const lblAz = document.getElementById('lbl-light-az');
@@ -1026,7 +967,6 @@
     slAz.addEventListener('input', updateRakingLight);
     slEl.addEventListener('input', updateRakingLight);
 
-    // Slicer Slider
     const chkSlicer = document.getElementById('chk-slicer');
     const slSlicer = document.getElementById('slider-slicer');
     const lblSlicer = document.getElementById('lbl-slice-val');
@@ -1044,14 +984,12 @@
 
     function updateSlicer() {
       const pct = parseFloat(slSlicer.value);
-      // Map 0 - 100% to Y height (-0.1 to 2.1)
-      const h = -0.1 + (pct / 100) * 2.2;
+      const h = -0.1 + (pct / 100) * 2.0;
       clipPlane.constant = h;
       lblSlicer.textContent = `${pct}%`;
     }
     slSlicer.addEventListener('input', updateSlicer);
 
-    // PNG Snapshot
     document.getElementById('btn-snapshot').addEventListener('click', () => {
       pinsOverlay.style.display = 'none';
       renderer.render(scene, camera);
@@ -1066,21 +1004,18 @@
       }
     });
 
-    // Mobile sidebar toggle
     const btnSidebar = document.getElementById('btn-toggle-sidebar');
     const sidebar = document.getElementById('sidebar');
     btnSidebar.addEventListener('click', () => {
       sidebar.classList.toggle('-translate-x-[110%]');
     });
 
-    // Window Resize
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    // 3D Pin screen projection
     const tempV = new THREE.Vector3();
     function updatePins() {
       if (!document.getElementById('chk-pins').checked) return;
@@ -1103,7 +1038,6 @@
       });
     }
 
-    // Subtle gentle breathing animation
     const clock = new THREE.Clock();
 
     function renderLoop() {
@@ -1114,9 +1048,8 @@
         controls.update();
       }
 
-      // Very subtle organic chest respiration
-      chestMesh.scale.x = 0.9 + Math.sin(t * 1.6) * 0.012;
-      chestMesh.scale.z = 0.95 + Math.sin(t * 1.6) * 0.012;
+      chestMesh.scale.x = 0.92 + Math.sin(t * 1.5) * 0.01;
+      chestMesh.scale.z = 0.94 + Math.sin(t * 1.5) * 0.01;
 
       updatePins();
       renderer.render(scene, camera);
