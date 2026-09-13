@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ネザーランドドワーフ 粘土造形 3D構造ビューア（精密改訂版）</title>
+  <title>ネザーランドドワーフ 造形学習3Dビューア（形態精密版 v2.1）</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Three.js & OrbitControls -->
@@ -77,10 +77,10 @@
       </div>
       <div>
         <h1 class="text-xs md:text-sm font-bold text-white flex items-center gap-1.5">
-          ネザーランドドワーフ 粘土造形3D構造解析
-          <span class="text-[10px] bg-emerald-950/90 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-700/50 font-medium">なだらかCカーブ精密版</span>
+          ネザーランドドワーフ 造形学習3D形態解析
+          <span class="text-[10px] bg-emerald-950/90 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-700/50 font-medium">頭部・短耳・深い後躯 精密版</span>
         </h1>
-        <p class="text-[10px] text-slate-400 hidden sm:block">自然な連続円弧背線・コビー体型・折りたたみ後肢・短マズル</p>
+        <p class="text-[10px] text-slate-400 hidden sm:block">大型の丸い頭部・短い直立耳・コンパクトな体・深い後躯・短いマズル</p>
       </div>
     </div>
 
@@ -239,7 +239,7 @@
 
   <script>
     /* =========================================================================
-       THREE.JS NETHERLAND DWARF RABBIT SCULPTURE VIEWER (SMOOTH C-CURVE)
+       THREE.JS NETHERLAND DWARF RABBIT SCULPTURE VIEWER (FORM-FIRST v2.1)
        ========================================================================= */
 
     const ANATOMY_ITEMS = [
@@ -251,7 +251,7 @@
         pos: [0.0, 0.98, -0.05],
         camPos: [2.5, 0.85, 0.0],
         lookAt: [0.0, 0.70, 0.0],
-        desc: '腰の不自然なコブや段差を排し、うなじから肩、背中中央、腰、臀部（お尻）までが滑らかで一体的な半円弧を描くネザーランドドワーフ特有のコビー背線です。',
+        desc: '短い体幹に深い肩とよく丸い後躯が連続する、なだらかなトップラインを観察します。局所的な『背中のコブ』を作らず、特に後躯の深さと丸みを優先します。',
         tip: '【粘土造形】真横（右側面）から観察し、背骨のラインを1本の滑らかな半円弧としてヘラで整えます。ボリュームは上へ盛り上げるのではなく、太もも・脇腹への左右の広がりに割り振ります。'
       },
       {
@@ -262,8 +262,8 @@
         pos: [0.10, 1.48, 0.06],
         camPos: [1.1, 1.6, 1.1],
         lookAt: [0.08, 1.35, 0.1],
-        desc: '成体でも約5cm以下と非常に短く、頭頂部でほぼ平行に寄り添うように直立。先端は尖らず丸いスプーン状で、外縁に黒い毛の引き締まったパイピングが入ります。',
-        tip: '【粘土造形】耳の長さは頭部全高の約0.4倍が黄金比。長くしすぎると別の品種に見えてしまうため、短く丸く厚みを持たせます。'
+        desc: '非常に短い直立耳で、頭部に対して耳が長く見えすぎないことが重要です。左右は近い間隔で立ち、先端は丸みを帯びます。色や耳縁の表現は品種・毛色によって変わるため、形態学習では輪郭を優先します。',
+        tip: '【粘土造形】耳を長くしすぎないことを優先します。ネザーランドドワーフらしさは、頭部の大きさに対して耳が短く見える比率にあります。長くしすぎると別の品種に見えてしまうため、短く丸く厚みを持たせます。'
       },
       {
         id: 'head',
@@ -274,7 +274,7 @@
         camPos: [1.2, 1.2, 1.1],
         lookAt: [0.0, 1.08, 0.28],
         desc: '横から見ても正面から見ても丸い、極めて短く詰まったマズル。額から鼻先にかけての凹凸（ストップ）が平坦で、愛らしいお団子型です。',
-        tip: '【粘土造形】アルミホイル芯はほぼ完全な球体にし、鼻口部の突き出しは最小限（平らな小丘程度）に抑えます。'
+        tip: '【粘土造形】頭蓋の幅と高さをしっかり確保し、鼻先は短く詰めます。『犬のような前方への口吻』を作らないのがポイントです。'
       },
       {
         id: 'cheek',
@@ -306,7 +306,7 @@
         pos: [0.12, 0.76, 0.38],
         camPos: [1.2, 0.8, 1.1],
         lookAt: [0.0, 0.72, 0.22],
-        desc: '首のくびれが外見上ほとんどなく、アゴ下からそのまま豊かな胸元の白毛へと繋がります。マフラーを巻いたような丸みがあります。',
+        desc: '頭部が肩に近く、高いヘッドセットで首が短く見えます。胸は丸く豊かですが、過度なマフラー状のデュラップを作らず、頭から肩への移行を滑らかにします。',
         tip: '【粘土造形】頭部と胴体を接合する際、アゴ下の隙間をしっかり粘土で埋め、首を作らずなだらかなスロープで胸へと繋げます。'
       },
       {
@@ -318,7 +318,7 @@
         camPos: [1.4, 0.55, 0.2],
         lookAt: [0.1, 0.42, -0.08],
         desc: 'お座り姿勢では力強い後足が胴体の両サイドに完全に折りたたまれ、大きな半球状の肉塊となってお座りの安定した土台を形成します。',
-        tip: '【粘土造形】胴体中心の芯材の両脇に、大きめの粘土の塊を「太もも」として左右対称に貼り付けて一体化させます。'
+        tip: '【粘土造形】後躯全体を大きな一つの塊として捉え、左右の太ももを作り込みます。横から見たときに後躯が浅くならないことを確認します。'
       },
       {
         id: 'foreleg',
@@ -329,7 +329,7 @@
         camPos: [0.8, 0.30, 1.1],
         lookAt: [0.05, 0.22, 0.25],
         desc: '胸の真下から地面に向かって2本が平行に真っ直ぐ伸びる前足。足先は座布団の上にちょこんと前向きに接地します。',
-        tip: '【粘土造形】前足を長く作りすぎると立位ポーズになってしまいます。短めに抑え、胴体底面と座布団との隙間を小さくします。'
+        tip: '【粘土造形】前足は短く、胸の下でほぼ垂直に。ショー姿勢の観察では前足を目の下に置く関係を目安にします。'
       }
     ];
 
@@ -406,19 +406,19 @@
       c.height = 512;
       const ctx = c.getContext('2d');
 
-      ctx.fillStyle = '#8e9399';
+      ctx.fillStyle = '#a9adb2';
       ctx.fillRect(0, 0, 512, 512);
 
-      for (let i = 0; i < 42000; i++) {
+      for (let i = 0; i < 32000; i++) {
         const x = Math.random() * 512;
         const y = Math.random() * 512;
         const r = Math.random();
         if (r < 0.36) {
-          ctx.fillStyle = 'rgba(25, 28, 35, 0.48)';
+          ctx.fillStyle = 'rgba(35, 38, 43, 0.34)';
         } else if (r < 0.74) {
-          ctx.fillStyle = 'rgba(245, 247, 250, 0.55)';
+          ctx.fillStyle = 'rgba(245, 247, 250, 0.46)';
         } else {
-          ctx.fillStyle = 'rgba(165, 155, 140, 0.35)';
+          ctx.fillStyle = 'rgba(175, 170, 165, 0.28)';
         }
         ctx.fillRect(x, y, 1.2, 1.2);
       }
@@ -518,6 +518,7 @@
       });
     }
 
+
     const rabbitMeshRegistry = [];
 
     function registerMesh(mesh, category) {
@@ -527,227 +528,346 @@
       return mesh;
     }
 
+    /*
+      NETHERLAND DWARF — FORM-FIRST SCULPTURAL MODEL
+      ------------------------------------------------
+      This version deliberately prioritizes breed silhouette over "cute bunny"
+      exaggeration.  The important proportions are:
+        • large, bold brachycephalic head set high on the shoulders
+        • very short, upright ears
+        • short, compact body with a deep, rounded hindquarter
+        • short forefeet positioned beneath the head/eyes
+        • no exaggerated neck/dewlap and no long muzzle
+      The body is made from deformed high-resolution spheres rather than a
+      stack of low-detail balls, so the silhouette reads as one clay form.
+    */
+
+    function makeDeformedSphere(radius, segW, segH, scale, position, material, category, deformFn) {
+      const geo = new THREE.SphereGeometry(radius, segW, segH);
+      const p = geo.attributes.position;
+      const v = new THREE.Vector3();
+
+      for (let i = 0; i < p.count; i++) {
+        v.fromBufferAttribute(p, i);
+        let q = v.clone().normalize();
+        let x = q.x, y = q.y, z = q.z;
+
+        if (deformFn) {
+          const d = deformFn(x, y, z);
+          x *= d.x;
+          y *= d.y;
+          z *= d.z;
+        }
+
+        p.setXYZ(i, x * radius * scale.x, y * radius * scale.y, z * radius * scale.z);
+      }
+      p.needsUpdate = true;
+      geo.computeVertexNormals();
+
+      const mesh = new THREE.Mesh(geo, material);
+      mesh.position.copy(position);
+      registerMesh(mesh, category);
+      rabbitRoot.add(mesh);
+      return mesh;
+    }
+
+
     const rabbitRoot = new THREE.Group();
     scene.add(rabbitRoot);
 
-    const torsoG = new THREE.Group();
-    torsoG.position.set(0, 0.62, -0.02);
-    torsoG.rotation.x = -0.26;
-    rabbitRoot.add(torsoG);
-
-    // Primary torso: seamless, organic single ellipsoid
-    const torsoMesh = new THREE.Mesh(
-      new THREE.SphereGeometry(0.53, 40, 36),
-      mats.fur.body
+    // ------------------------------------------------------------
+    // BODY — short, deep and compact rather than elongated
+    // ------------------------------------------------------------
+    const torsoMesh = makeDeformedSphere(
+      1, 64, 48,
+      new THREE.Vector3(0.54, 0.62, 0.72),
+      new THREE.Vector3(0, 0.58, -0.05),
+      mats.fur.body, 'torso',
+      (x, y, z) => {
+        // A broad, deep rump with a slightly tighter shoulder.
+        const rump = THREE.MathUtils.clamp((-z + 0.05) / 1.05, 0, 1);
+        const shoulder = THREE.MathUtils.clamp((z + 0.25) / 1.0, 0, 1);
+        return new THREE.Vector3(
+          0.96 + rump * 0.10 - shoulder * 0.035,
+          0.98 + rump * 0.10,
+          1.00 + rump * 0.06
+        );
+      }
     );
-    torsoMesh.scale.set(0.92, 1.16, 1.26);
-    registerMesh(torsoMesh, 'torso');
-    torsoG.add(torsoMesh);
 
-    // Gentle, smooth dorsal thoracic arch (no localized waist hump)
-    const smoothArch = new THREE.Mesh(
-      new THREE.SphereGeometry(0.48, 36, 32),
-      mats.fur.body
+    // Subtle lower chest transition.  This is NOT a giant dewlap.
+    const chestMesh = makeDeformedSphere(
+      1, 56, 44,
+      new THREE.Vector3(0.48, 0.50, 0.44),
+      new THREE.Vector3(0, 0.67, 0.34),
+      mats.fur.body, 'chest',
+      (x, y, z) => new THREE.Vector3(1.0, 1.0, 1.0)
     );
-    smoothArch.position.set(0, 0.12, -0.06);
-    smoothArch.scale.set(0.86, 0.98, 1.14);
-    registerMesh(smoothArch, 'torso');
-    torsoG.add(smoothArch);
 
-    const chestMesh = new THREE.Mesh(
-      new THREE.SphereGeometry(0.36, 36, 32),
-      mats.fur.body
+    const chestBib = makeDeformedSphere(
+      1, 48, 36,
+      new THREE.Vector3(0.37, 0.40, 0.16),
+      new THREE.Vector3(0, 0.62, 0.48),
+      mats.fur.white, 'chest',
+      (x, y, z) => new THREE.Vector3(1.0, 1.0, 1.0)
     );
-    chestMesh.position.set(0, 0.68, 0.24);
-    chestMesh.scale.set(0.92, 1.02, 0.94);
-    chestMesh.rotation.x = 0.18;
-    registerMesh(chestMesh, 'chest');
-    rabbitRoot.add(chestMesh);
 
-    const chestBib = new THREE.Mesh(
-      new THREE.SphereGeometry(0.31, 32, 28),
-      mats.fur.white
-    );
-    chestBib.position.set(0, 0.64, 0.39);
-    chestBib.scale.set(0.72, 0.92, 0.46);
-    registerMesh(chestBib, 'chest');
-    rabbitRoot.add(chestBib);
-
+    // ------------------------------------------------------------
+    // HEAD — the defining Netherland Dwarf feature
+    // Large, round, bold and short-faced.
+    // ------------------------------------------------------------
     const headG = new THREE.Group();
-    headG.position.set(0, 1.10, 0.20);
+    headG.position.set(0, 1.12, 0.31);
     rabbitRoot.add(headG);
 
     const headMesh = new THREE.Mesh(
-      new THREE.SphereGeometry(0.35, 40, 36),
+      new THREE.SphereGeometry(1, 64, 48),
       mats.fur.body
     );
-    headMesh.scale.set(0.96, 0.92, 1.0);
-    registerMesh(headMesh, 'head');
+    headMesh.scale.set(0.49, 0.48, 0.46);
+    headMesh.castShadow = headMesh.receiveShadow = true;
+    rabbitMeshRegistry.push({ mesh: headMesh, category: 'head' });
     headG.add(headMesh);
 
-    const cheekGeo = new THREE.SphereGeometry(0.22, 32, 28);
-    cheekGeo.scale(1.15, 0.88, 1.0);
+    // Broad lower cheek/jowl volume — integrated, not two obvious balls.
+    function cheekMesh(sign) {
+      const m = new THREE.Mesh(
+        new THREE.SphereGeometry(1, 48, 36),
+        mats.fur.body
+      );
+      m.scale.set(0.265, 0.285, 0.235);
+      m.position.set(sign * 0.225, -0.055, 0.045);
+      m.castShadow = m.receiveShadow = true;
+      rabbitMeshRegistry.push({ mesh: m, category: 'cheeks' });
+      headG.add(m);
+      return m;
+    }
+    const rightCheek = cheekMesh(1);
+    const leftCheek = cheekMesh(-1);
 
-    const rightCheek = new THREE.Mesh(cheekGeo, mats.fur.body);
-    rightCheek.position.set(0.20, -0.08, 0.08);
-    registerMesh(rightCheek, 'cheeks');
-    headG.add(rightCheek);
-
-    const leftCheek = new THREE.Mesh(cheekGeo, mats.fur.body);
-    leftCheek.position.set(-0.20, -0.08, 0.08);
-    registerMesh(leftCheek, 'cheeks');
-    headG.add(leftCheek);
-
+    // Very short muzzle.  The nose should not project like a small-dog snout.
     const muzzleMesh = new THREE.Mesh(
-      new THREE.SphereGeometry(0.16, 28, 24),
+      new THREE.SphereGeometry(1, 48, 36),
       mats.fur.body
     );
-    muzzleMesh.position.set(0, -0.10, 0.27);
-    muzzleMesh.scale.set(0.92, 0.8, 1.05);
-    registerMesh(muzzleMesh, 'head');
+    muzzleMesh.scale.set(0.22, 0.145, 0.17);
+    muzzleMesh.position.set(0, -0.095, 0.405);
+    muzzleMesh.castShadow = muzzleMesh.receiveShadow = true;
+    rabbitMeshRegistry.push({ mesh: muzzleMesh, category: 'head' });
     headG.add(muzzleMesh);
 
+    // Nose + subtle philtrum / mouth.
     const noseMesh = new THREE.Mesh(
-      new THREE.SphereGeometry(0.04, 16, 16),
+      new THREE.SphereGeometry(1, 24, 18),
       mats.fur.nose
     );
-    noseMesh.position.set(0, -0.05, 0.42);
-    noseMesh.scale.set(1.0, 0.7, 0.7);
-    registerMesh(noseMesh, 'head');
+    noseMesh.scale.set(0.060, 0.045, 0.035);
+    noseMesh.position.set(0, -0.075, 0.555);
+    noseMesh.castShadow = noseMesh.receiveShadow = true;
+    rabbitMeshRegistry.push({ mesh: noseMesh, category: 'head' });
     headG.add(noseMesh);
 
-    const eyeGeo = new THREE.SphereGeometry(0.078, 28, 28);
-    const ringGeo = new THREE.TorusGeometry(0.079, 0.011, 16, 32);
+    const mouthGeo = new THREE.TorusGeometry(0.047, 0.006, 8, 20, Math.PI);
+    const mouth = new THREE.Mesh(mouthGeo, mats.fur.nose);
+    mouth.rotation.set(Math.PI / 2, 0, 0);
+    mouth.scale.set(0.8, 0.55, 1);
+    mouth.position.set(0, -0.135, 0.555);
+    mouth.castShadow = true;
+    rabbitMeshRegistry.push({ mesh: mouth, category: 'head' });
+    headG.add(mouth);
 
-    const rightEye = new THREE.Mesh(eyeGeo, mats.fur.eye);
-    rightEye.position.set(0.28, 0.06, 0.11);
-    registerMesh(rightEye, 'eyes');
-    headG.add(rightEye);
+    // ------------------------------------------------------------
+    // EYES — large, lateral and set into the round skull
+    // ------------------------------------------------------------
+    const eyeGeo = new THREE.SphereGeometry(0.088, 32, 24);
+    const ringGeo = new THREE.TorusGeometry(0.092, 0.009, 12, 32);
 
-    const rightRing = new THREE.Mesh(ringGeo, mats.fur.eyeRing);
-    rightRing.position.copy(rightEye.position);
-    rightRing.rotation.y = 1.35;
-    registerMesh(rightRing, 'eyes');
-    headG.add(rightRing);
+    function buildEye(sign) {
+      const eye = new THREE.Mesh(eyeGeo, mats.fur.eye);
+      eye.position.set(sign * 0.405, 0.055, 0.185);
+      eye.castShadow = eye.receiveShadow = true;
+      rabbitMeshRegistry.push({ mesh: eye, category: 'eyes' });
+      headG.add(eye);
 
-    const leftEye = new THREE.Mesh(eyeGeo, mats.fur.eye);
-    leftEye.position.set(-0.28, 0.06, 0.11);
-    registerMesh(leftEye, 'eyes');
-    headG.add(leftEye);
-
-    const leftRing = new THREE.Mesh(ringGeo, mats.fur.eyeRing);
-    leftRing.position.copy(leftEye.position);
-    leftRing.rotation.y = -1.35;
-    registerMesh(leftRing, 'eyes');
-    headG.add(leftRing);
-
-    function buildEar(isRight) {
-      const ear = new THREE.Group();
-      const sign = isRight ? 1 : -1;
-
-      const outerMesh = new THREE.Mesh(
-        new THREE.SphereGeometry(0.12, 28, 24),
-        mats.fur.body
-      );
-      outerMesh.scale.set(0.7, 1.8, 0.42);
-      outerMesh.position.set(0, 0.20, 0);
-      registerMesh(outerMesh, 'ears');
-      ear.add(outerMesh);
-
-      const innerMesh = new THREE.Mesh(
-        new THREE.SphereGeometry(0.10, 24, 20),
-        mats.fur.earInner
-      );
-      innerMesh.scale.set(0.55, 1.55, 0.28);
-      innerMesh.position.set(0, 0.19, 0.032);
-      registerMesh(innerMesh, 'ears');
-      ear.add(innerMesh);
-
-      const tipMesh = new THREE.Mesh(
-        new THREE.SphereGeometry(0.082, 20, 16),
-        mats.fur.earRim
-      );
-      tipMesh.scale.set(0.68, 0.48, 0.4);
-      tipMesh.position.set(0, 0.38, 0);
-      registerMesh(tipMesh, 'ears');
-      ear.add(tipMesh);
-
-      ear.position.set(sign * 0.10, 0.29, -0.04);
-      ear.rotation.z = sign * -0.14;
-      ear.rotation.x = -0.06;
-      ear.rotation.y = sign * 0.10;
-      return ear;
+      const ring = new THREE.Mesh(ringGeo, mats.fur.eyeRing);
+      ring.position.copy(eye.position);
+      ring.rotation.y = sign * 1.48;
+      ring.castShadow = true;
+      rabbitMeshRegistry.push({ mesh: ring, category: 'eyes' });
+      headG.add(ring);
     }
-    headG.add(buildEar(true));
-    headG.add(buildEar(false));
+    buildEye(1);
+    buildEye(-1);
 
-    const thighGeo = new THREE.SphereGeometry(0.39, 32, 28);
-    thighGeo.scale(0.64, 0.94, 1.20);
+    // ------------------------------------------------------------
+    // EARS — short, thick, upright and rounded.
+    // A custom rounded capsule silhouette avoids the "mouse ears"
+    // produced by a stretched sphere.
+    // ------------------------------------------------------------
+    function roundedEar(sign) {
+      const group = new THREE.Group();
 
-    const rightThigh = new THREE.Mesh(thighGeo, mats.fur.body);
-    rightThigh.position.set(0.34, 0.40, -0.10);
-    rightThigh.rotation.set(-0.22, 0.12, 0.18);
-    registerMesh(rightThigh, 'thighs');
-    rabbitRoot.add(rightThigh);
+      const outerShape = new THREE.Shape();
+      outerShape.moveTo(-0.105, -0.26);
+      outerShape.quadraticCurveTo(-0.13, -0.02, -0.105, 0.20);
+      outerShape.quadraticCurveTo(-0.08, 0.31, 0.0, 0.335);
+      outerShape.quadraticCurveTo(0.08, 0.31, 0.105, 0.20);
+      outerShape.quadraticCurveTo(0.13, -0.02, 0.105, -0.26);
+      outerShape.quadraticCurveTo(0.0, -0.315, -0.105, -0.26);
 
-    const leftThigh = new THREE.Mesh(thighGeo, mats.fur.body);
-    leftThigh.position.set(-0.34, 0.40, -0.10);
-    leftThigh.rotation.set(-0.22, -0.12, -0.18);
-    registerMesh(leftThigh, 'thighs');
-    rabbitRoot.add(leftThigh);
+      const outerGeo = new THREE.ExtrudeGeometry(outerShape, {
+        depth: 0.075,
+        bevelEnabled: true,
+        bevelSegments: 4,
+        steps: 2,
+        bevelSize: 0.025,
+        bevelThickness: 0.018
+      });
+      outerGeo.center();
 
-    function buildForeleg(isRight) {
+      const outer = new THREE.Mesh(outerGeo, mats.fur.body);
+      outer.scale.set(0.80, 0.88, 0.75);
+      outer.position.z = -0.005;
+      outer.castShadow = outer.receiveShadow = true;
+      rabbitMeshRegistry.push({ mesh: outer, category: 'ears' });
+      group.add(outer);
+
+      const innerShape = new THREE.Shape();
+      innerShape.moveTo(-0.072, -0.21);
+      innerShape.quadraticCurveTo(-0.085, 0.0, -0.065, 0.17);
+      innerShape.quadraticCurveTo(0, 0.235, 0.065, 0.17);
+      innerShape.quadraticCurveTo(0.085, 0.0, 0.072, -0.21);
+      innerShape.quadraticCurveTo(0, -0.245, -0.072, -0.21);
+
+      const innerGeo = new THREE.ExtrudeGeometry(innerShape, {
+        depth: 0.018,
+        bevelEnabled: true,
+        bevelSegments: 3,
+        bevelSize: 0.008,
+        bevelThickness: 0.004
+      });
+      innerGeo.center();
+
+      const inner = new THREE.Mesh(innerGeo, mats.fur.earInner);
+      inner.scale.set(0.78, 0.82, 1);
+      inner.position.set(0, -0.005, 0.048);
+      inner.castShadow = true;
+      rabbitMeshRegistry.push({ mesh: inner, category: 'ears' });
+      group.add(inner);
+
+      group.position.set(sign * 0.135, 0.405, 0.04);
+      group.rotation.z = sign * -0.045;
+      group.rotation.y = sign * 0.055;
+      group.scale.set(0.82, 0.82, 0.90);
+      return group;
+    }
+
+    headG.add(roundedEar(1));
+    headG.add(roundedEar(-1));
+
+    // ------------------------------------------------------------
+    // HINDQUARTERS — deep, full and rounded.
+    // The haunches should read as one large rear mass from the side.
+    // ------------------------------------------------------------
+    function makeHaunch(sign) {
+      const m = makeDeformedSphere(
+        1, 52, 40,
+        new THREE.Vector3(0.34, 0.43, 0.48),
+        new THREE.Vector3(sign * 0.34, 0.42, -0.27),
+        mats.fur.body, 'thighs',
+        (x, y, z) => new THREE.Vector3(1.0, 1.03, 1.05)
+      );
+      m.rotation.z = sign * 0.08;
+      return m;
+    }
+    makeHaunch(1);
+    makeHaunch(-1);
+
+    // ------------------------------------------------------------
+    // FORELEGS — short, vertical, tucked close to chest.
+    // ------------------------------------------------------------
+    function buildForeleg(sign) {
       const leg = new THREE.Group();
-      const sign = isRight ? 1 : -1;
 
-      const legMesh = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.075, 0.085, 0.35, 24),
+      // Three.js r128 does not have CapsuleGeometry (it was added later).
+      // Use a high-resolution ellipsoid instead so the r128 single-file build
+      // cannot fail during scene construction.
+      const upper = new THREE.Mesh(
+        new THREE.SphereGeometry(1, 28, 20),
         mats.fur.body
       );
-      legMesh.position.y = 0.175;
-      registerMesh(legMesh, 'forelegs');
-      leg.add(legMesh);
+      upper.scale.set(0.058, 0.15, 0.075);
+      upper.position.y = 0.135;
+      upper.castShadow = upper.receiveShadow = true;
+      rabbitMeshRegistry.push({ mesh: upper, category: 'forelegs' });
+      leg.add(upper);
 
-      const pawMesh = new THREE.Mesh(
-        new THREE.SphereGeometry(0.092, 24, 20),
+      const paw = new THREE.Mesh(
+        new THREE.SphereGeometry(1, 28, 20),
         mats.fur.white
       );
-      pawMesh.position.set(0, 0.045, 0.065);
-      pawMesh.scale.set(0.85, 0.52, 1.32);
-      registerMesh(pawMesh, 'forelegs');
-      leg.add(pawMesh);
+      paw.scale.set(0.075, 0.055, 0.13);
+      paw.position.set(0, 0.025, 0.075);
+      paw.castShadow = paw.receiveShadow = true;
+      rabbitMeshRegistry.push({ mesh: paw, category: 'forelegs' });
+      leg.add(paw);
 
-      leg.position.set(sign * 0.10, 0.04, 0.30);
-      leg.rotation.x = -0.04;
-      return leg;
+      leg.position.set(sign * 0.145, 0.075, 0.37);
+      rabbitRoot.add(leg);
     }
-    rabbitRoot.add(buildForeleg(true));
-    rabbitRoot.add(buildForeleg(false));
+    buildForeleg(1);
+    buildForeleg(-1);
 
-    const hindFootGeo = new THREE.SphereGeometry(0.085, 20, 16);
-    hindFootGeo.scale(0.86, 0.48, 1.35);
+    // ------------------------------------------------------------
+    // HIND FEET — mostly tucked; only the toe mass peeks forward.
+    // ------------------------------------------------------------
+    function makeHindFoot(sign) {
+      const foot = new THREE.Mesh(
+        new THREE.SphereGeometry(1, 32, 22),
+        mats.fur.white
+      );
+      foot.scale.set(0.15, 0.075, 0.255);
+      foot.position.set(sign * 0.31, 0.075, 0.075);
+      foot.rotation.y = sign * 0.12;
+      foot.castShadow = foot.receiveShadow = true;
+      rabbitMeshRegistry.push({ mesh: foot, category: 'feet' });
+      rabbitRoot.add(foot);
+    }
+    makeHindFoot(1);
+    makeHindFoot(-1);
 
-    const rightHindFoot = new THREE.Mesh(hindFootGeo, mats.fur.white);
-    rightHindFoot.position.set(0.27, 0.042, 0.20);
-    rightHindFoot.rotation.y = 0.20;
-    registerMesh(rightHindFoot, 'feet');
-    rabbitRoot.add(rightHindFoot);
-
-    const leftHindFoot = new THREE.Mesh(hindFootGeo, mats.fur.white);
-    leftHindFoot.position.set(-0.27, 0.042, 0.20);
-    leftHindFoot.rotation.y = -0.20;
-    registerMesh(leftHindFoot, 'feet');
-    rabbitRoot.add(leftHindFoot);
-
+    // Tail: small, high and rounded, not a giant pom-pom.
     const tailMesh = new THREE.Mesh(
-      new THREE.SphereGeometry(0.12, 24, 20),
+      new THREE.SphereGeometry(1, 32, 24),
       mats.fur.white
     );
-    tailMesh.position.set(0, 0.36, -0.62);
-    tailMesh.scale.set(0.8, 1.1, 0.88);
-    tailMesh.rotation.x = 0.32;
-    registerMesh(tailMesh, 'tail');
+    tailMesh.scale.set(0.14, 0.15, 0.14);
+    tailMesh.position.set(0, 0.46, -0.74);
+    tailMesh.castShadow = tailMesh.receiveShadow = true;
+    rabbitMeshRegistry.push({ mesh: tailMesh, category: 'tail' });
     rabbitRoot.add(tailMesh);
+
+    // Whiskers are kept subtle: useful for anatomy, but not a cartoon effect.
+    const whiskerGroup = new THREE.Group();
+    whiskerGroup.position.set(0, 1.01, 0.74);
+    rabbitRoot.add(whiskerGroup);
+
+    function makeWhisker(sign, y, z, len, tilt) {
+      const curve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(sign * 0.08, y, z),
+        new THREE.Vector3(sign * 0.22, y + tilt * 0.02, z + 0.015),
+        new THREE.Vector3(sign * len, y + tilt, z + 0.02)
+      ]);
+      const geo = new THREE.TubeGeometry(curve, 12, 0.004, 6, false);
+      const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({
+        color: 0xcbd5e1, transparent: true, opacity: 0.58
+      }));
+      whiskerGroup.add(m);
+    }
+    makeWhisker(1, 0.02, 0.00, 0.48, 0.07);
+    makeWhisker(1, -0.01, 0.00, 0.46, -0.03);
+    makeWhisker(-1, 0.02, 0.00, 0.48, 0.07);
+    makeWhisker(-1, -0.01, 0.00, 0.46, -0.03);
 
     const cushionGroup = new THREE.Group();
     scene.add(cushionGroup);
