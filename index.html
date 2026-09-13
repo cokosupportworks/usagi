@@ -3,1676 +3,1137 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ネザーランドドワーフ 粘土造形・3D構造ビューア</title>
-  <style>
-    :root {
-      --bg-color: #121418;
-      --card-bg: rgba(26, 30, 38, 0.88);
-      --card-border: rgba(255, 255, 255, 0.1);
-      --accent: #e59a3c;
-      --accent-hover: #f3aa4e;
-      --accent-soft: rgba(229, 154, 60, 0.18);
-      --text-main: #f0f2f5;
-      --text-sub: #a0a6b2;
-      --panel-width: 380px;
-    }
+  <title>ネザーランドドワーフ 粘土造形 3D構造ビューア</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Three.js & OrbitControls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=M+PLUS+Rounded+1c:wght@400;500;700&display=swap" rel="stylesheet">
 
+  <style>
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
       -webkit-tap-highlight-color: transparent;
     }
-
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "BIZ UDPGothic", Meiryo, sans-serif;
-      background: var(--bg-color);
-      color: var(--text-main);
+      font-family: 'Inter', 'M PLUS Rounded 1c', sans-serif;
       overflow: hidden;
+      touch-action: none;
+      user-select: none;
+    }
+    /* Scrollbars */
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(100, 116, 139, 0.5);
+      border-radius: 9999px;
+    }
+    /* 3D Canvas */
+    #canvas-container {
       width: 100vw;
       height: 100vh;
-      display: flex;
-    }
-
-    #viewport-container {
-      flex: 1;
-      height: 100%;
-      position: relative;
-      background: radial-gradient(circle at center, #242933 0%, #101216 100%);
-      overflow: hidden;
-    }
-
-    #three-canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-
-    /* Top Navigation / Status Header */
-    .top-bar {
       position: absolute;
-      top: 16px;
-      left: 16px;
-      right: calc(var(--panel-width) + 24px);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      pointer-events: none;
-      z-index: 10;
-    }
-
-    .app-title-card {
-      background: var(--card-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--card-border);
-      padding: 12px 18px;
-      border-radius: 12px;
-      pointer-events: auto;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.35);
-    }
-
-    .app-title-card h1 {
-      font-size: 1.1rem;
-      font-weight: 700;
-      letter-spacing: 0.03em;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: #fff;
-    }
-
-    .app-title-card p {
-      font-size: 0.78rem;
-      color: var(--text-sub);
-      margin-top: 2px;
-    }
-
-    .top-actions {
-      display: flex;
-      gap: 8px;
-      pointer-events: auto;
-    }
-
-    .action-btn {
-      background: var(--card-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--card-border);
-      color: var(--text-main);
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-size: 0.82rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-    }
-
-    .action-btn:hover {
-      background: rgba(45, 52, 65, 0.95);
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
-    /* Floating View Controls */
-    .viewport-controls-bottom {
-      position: absolute;
-      bottom: 20px;
-      left: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      z-index: 10;
-      pointer-events: none;
-    }
-
-    .view-preset-bar {
-      background: var(--card-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--card-border);
-      border-radius: 30px;
-      padding: 6px 10px;
-      display: flex;
-      gap: 4px;
-      pointer-events: auto;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-      flex-wrap: wrap;
-      max-width: 90vw;
-    }
-
-    .preset-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-sub);
-      padding: 6px 12px;
-      font-size: 0.78rem;
-      border-radius: 20px;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      white-space: nowrap;
-    }
-
-    .preset-btn:hover {
-      color: #fff;
-      background: rgba(255,255,255,0.08);
-    }
-
-    .preset-btn.active {
-      background: var(--accent);
-      color: #121418;
-      font-weight: 700;
-    }
-
-    .preset-btn.special-photo {
-      background: linear-gradient(135deg, #e59a3c 0%, #d87326 100%);
-      color: #111;
-      font-weight: 700;
-    }
-
-    /* Floating Tool Toggles */
-    .mode-floating-bar {
-      position: absolute;
-      top: 90px;
-      left: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      z-index: 10;
-      pointer-events: auto;
-    }
-
-    .mode-btn {
-      background: var(--card-bg);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid var(--card-border);
-      color: var(--text-main);
-      padding: 8px 12px;
-      border-radius: 10px;
-      font-size: 0.8rem;
-      text-align: left;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.15s ease;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
-    }
-
-    .mode-btn:hover {
-      background: rgba(45, 52, 65, 0.9);
-    }
-
-    .mode-btn.active {
-      border-color: var(--accent);
-      background: var(--accent-soft);
-      color: var(--accent);
-      font-weight: 700;
-    }
-
-    /* Side Control & Anatomy Guide Panel */
-    #sidebar-panel {
-      width: var(--panel-width);
-      height: 100%;
-      background: var(--card-bg);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-left: 1px solid var(--card-border);
-      display: flex;
-      flex-direction: column;
-      z-index: 20;
-      box-shadow: -6px 0 24px rgba(0,0,0,0.4);
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .sidebar-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--card-border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .tab-nav {
-      display: flex;
-      background: rgba(0,0,0,0.3);
-      padding: 3px;
-      border-radius: 8px;
-      gap: 2px;
-      width: 100%;
-    }
-
-    .tab-nav-btn {
-      flex: 1;
-      background: transparent;
-      border: none;
-      color: var(--text-sub);
-      padding: 8px 6px;
-      font-size: 0.8rem;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      text-align: center;
-    }
-
-    .tab-nav-btn.active {
-      background: var(--accent);
-      color: #121418;
-      font-weight: 700;
-    }
-
-    .sidebar-content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 18px 20px;
-    }
-
-    .sidebar-content::-webkit-scrollbar {
-      width: 6px;
-    }
-    .sidebar-content::-webkit-scrollbar-thumb {
-      background: rgba(255,255,255,0.15);
-      border-radius: 3px;
-    }
-
-    .tab-pane {
-      display: none;
-    }
-    .tab-pane.active {
-      display: block;
-    }
-
-    .section-title {
-      font-size: 0.88rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--accent);
-      margin: 16px 0 10px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .section-title:first-child {
-      margin-top: 0;
-    }
-
-    /* Control Groups */
-    .control-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      font-size: 0.82rem;
-    }
-
-    .control-row label {
-      color: var(--text-main);
-    }
-
-    .range-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex: 1;
-      max-width: 190px;
-    }
-
-    input[type="range"] {
-      -webkit-appearance: none;
-      width: 100%;
-      height: 6px;
-      background: rgba(255,255,255,0.15);
-      border-radius: 3px;
-      outline: none;
-    }
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: var(--accent);
-      cursor: pointer;
-      border: 2px solid #1a1e26;
-    }
-
-    .range-val {
-      font-size: 0.76rem;
-      color: var(--text-sub);
-      width: 32px;
-      text-align: right;
-    }
-
-    /* Anatomy Point Cards */
-    .point-card {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 10px;
-      padding: 12px 14px;
-      margin-bottom: 10px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .point-card:hover {
-      background: rgba(255,255,255,0.07);
-      border-color: rgba(229,154,60,0.5);
-      transform: translateX(2px);
-    }
-    .point-card.active {
-      background: var(--accent-soft);
-      border-color: var(--accent);
-    }
-    .point-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .point-badge {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: #121418;
-      font-weight: 800;
-      font-size: 0.75rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .point-name {
-      font-size: 0.88rem;
-      font-weight: 700;
-      color: #fff;
-    }
-    .point-subtitle {
-      font-size: 0.74rem;
-      color: var(--accent);
-      margin-left: auto;
-    }
-    .point-body {
-      font-size: 0.8rem;
-      line-height: 1.45;
-      color: #d0d4dc;
-      margin-top: 8px;
-    }
-    .point-tips {
-      margin-top: 6px;
-      padding: 6px 8px;
-      background: rgba(0,0,0,0.25);
-      border-left: 3px solid var(--accent);
-      border-radius: 0 6px 6px 0;
-      font-size: 0.74rem;
-      color: #e5b377;
-    }
-
-    /* Sculpting Workflow Timeline */
-    .workflow-step {
-      position: relative;
-      padding-left: 28px;
-      margin-bottom: 18px;
-    }
-    .workflow-step::before {
-      content: "";
-      position: absolute;
-      left: 10px;
-      top: 24px;
-      bottom: -12px;
-      width: 2px;
-      background: rgba(255,255,255,0.12);
-    }
-    .workflow-step:last-child::before {
-      display: none;
-    }
-    .step-marker {
-      position: absolute;
-      left: 0;
       top: 0;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: #2b3240;
-      border: 2px solid var(--accent);
-      color: var(--accent);
-      font-weight: bold;
-      font-size: 0.72rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      left: 0;
+      z-index: 1;
     }
-    .step-title {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: #fff;
-      margin-bottom: 4px;
-    }
-    .step-desc {
-      font-size: 0.78rem;
-      color: var(--text-sub);
-      line-height: 1.45;
-    }
-
-    /* Toggle switch */
-    .toggle-switch {
-      position: relative;
-      display: inline-block;
-      width: 44px;
-      height: 24px;
-    }
-    .toggle-switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-    .slider-toggle {
-      position: absolute;
-      cursor: pointer;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: rgba(255,255,255,0.15);
-      transition: .3s;
-      border-radius: 24px;
-    }
-    .slider-toggle:before {
-      position: absolute;
-      content: "";
-      height: 18px;
-      width: 18px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: .3s;
-      border-radius: 50%;
-    }
-    input:checked + .slider-toggle {
-      background-color: var(--accent);
-    }
-    input:checked + .slider-toggle:before {
-      transform: translateX(20px);
-    }
-
-    /* 3D Pin Overlay in Canvas */
+    /* Pins Overlay */
     .pin-label {
       position: absolute;
       transform: translate(-50%, -50%);
-      background: rgba(18, 20, 24, 0.9);
-      border: 1.5px solid var(--accent);
-      color: #fff;
-      font-size: 0.72rem;
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 14px;
       pointer-events: auto;
       cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-      transition: all 0.2s ease;
-      white-space: nowrap;
-      user-select: none;
-      z-index: 5;
+      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
     }
     .pin-label:hover {
-      background: var(--accent);
-      color: #121418;
-      transform: translate(-50%, -50%) scale(1.1);
+      transform: translate(-50%, -50%) scale(1.25);
     }
-
-    /* Responsive Design */
-    @media (max-width: 900px) {
-      body {
-        flex-direction: column;
-      }
-      #viewport-container {
-        height: 60vh;
-      }
-      #sidebar-panel {
-        width: 100%;
-        height: 40vh;
-      }
-      .top-bar {
-        right: 16px;
-      }
+    /* Glassmorphism */
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
   </style>
-  <!-- Three.js and OrbitControls via reliable CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 </head>
-<body>
 
-  <!-- 3D Viewport Container -->
-  <div id="viewport-container">
-    <canvas id="three-canvas"></canvas>
+<body class="bg-slate-950 text-slate-100 min-h-screen w-screen relative overflow-hidden">
 
-    <!-- 3D Pins Container (Screenspace projected) -->
-    <div id="pins-container"></div>
+  <div id="canvas-container"></div>
+  <div id="pins-overlay" class="absolute inset-0 pointer-events-none z-10 overflow-hidden"></div>
 
-    <!-- Top Navigation -->
-    <div class="top-bar">
-      <div class="app-title-card">
-        <h1>🐰 ネザーランドドワーフ 粘土造形3D構造ビューア</h1>
-        <p>添付画像のお座り姿勢 — 360°立体検証・ブロック分解・ライティング解析</p>
+  <!-- Top Header Bar -->
+  <header class="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-3 md:px-5 py-2.5 glass-panel border-b border-slate-800">
+    <div class="flex items-center space-x-2.5">
+      <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-lg border border-amber-500/30">
+        🐰
       </div>
-      <div class="top-actions">
-        <button class="action-btn" id="btn-snapshot" title="現在の角度をPNG画像として保存">
-          📸 スクリーンショット
+      <div>
+        <h1 class="text-xs md:text-sm font-bold text-white flex items-center gap-1.5">
+          ネザーランドドワーフ 粘土造形ビューア
+          <span class="text-[10px] bg-amber-950/80 text-amber-300 px-1.5 py-0.5 rounded border border-amber-700/50 font-medium">お座り姿勢 3D構造解析</span>
+        </h1>
+        <p class="text-[10px] text-slate-400 hidden sm:block">チンチラ／アグーティ毛色実写に基づく骨格・肉付き・アタリ検証</p>
+      </div>
+    </div>
+
+    <!-- Header Actions -->
+    <div class="flex items-center space-x-1.5">
+      <button id="btn-turntable" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 border border-slate-700 flex items-center gap-1 transition">
+        <svg class="w-3.5 h-3.5 text-amber-400 animate-spin-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+        <span id="turntable-text" class="text-[11px]">回転: OFF</span>
+      </button>
+
+      <button id="btn-snapshot" title="撮影 (高解像度PNG)" class="px-2.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-xs font-semibold text-white shadow-md flex items-center gap-1 transition active:scale-95">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><circle cx="12" cy="13" r="3" stroke-width="2"></circle></svg>
+        <span class="text-[11px] hidden sm:inline">撮影</span>
+      </button>
+
+      <button id="btn-toggle-sidebar" class="md:hidden px-2 py-1.5 rounded-lg bg-slate-800 text-slate-200 border border-slate-700 text-xs flex items-center gap-1">
+        <span>メニュー</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Left Side: Sculptor Controls -->
+  <aside id="sidebar" class="absolute top-14 bottom-3 left-3 z-20 w-72 md:w-80 max-w-[calc(100vw-1.5rem)] flex flex-col gap-2.5 pointer-events-auto transition-transform duration-300">
+    
+    <!-- 1. Material Selector -->
+    <div class="glass-panel rounded-xl p-3 shadow-xl">
+      <div class="text-[11px] font-bold text-amber-400 uppercase tracking-wider mb-2 flex items-center justify-between">
+        <span>🎨 表示マテリアル（造形検証）</span>
+      </div>
+      <div class="grid grid-cols-2 gap-1.5 text-xs">
+        <button data-mode="fur" class="mat-btn active p-2 rounded-lg bg-amber-600 text-white font-medium text-left flex items-center gap-2 transition">
+          <span class="w-3 h-3 rounded-full bg-slate-300 border border-slate-400 shrink-0"></span>
+          <span class="text-[11px] font-semibold">リアル毛並み</span>
         </button>
-        <button class="action-btn" id="btn-reset-cam" title="初期アングルに戻す">
-          ↺ リセット
+        <button data-mode="clay" class="mat-btn p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-left flex items-center gap-2 transition">
+          <span class="w-3 h-3 rounded-full bg-slate-400 shrink-0"></span>
+          <span class="text-[11px]">造形グレー</span>
+        </button>
+        <button data-mode="terracotta" class="mat-btn p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-left flex items-center gap-2 transition">
+          <span class="w-3 h-3 rounded-full bg-amber-700 shrink-0"></span>
+          <span class="text-[11px]">テラコッタ</span>
+        </button>
+        <button data-mode="blockin" class="mat-btn p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-left flex items-center gap-2 transition">
+          <span class="w-3 h-3 rounded-full bg-gradient-to-tr from-pink-500 via-sky-400 to-amber-400 shrink-0"></span>
+          <span class="text-[11px]">アタリ塊分解</span>
+        </button>
+      </div>
+
+      <!-- Quick Toggles -->
+      <div class="mt-2.5 pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-300">
+        <label class="flex items-center gap-1.5 cursor-pointer hover:text-white">
+          <input type="checkbox" id="chk-wire" class="rounded border-slate-700 bg-slate-800 text-amber-500">
+          <span>ワイヤ枠</span>
+        </label>
+        <label class="flex items-center gap-1.5 cursor-pointer hover:text-white">
+          <input type="checkbox" id="chk-cushion" checked class="rounded border-slate-700 bg-slate-800 text-amber-500">
+          <span>座布団</span>
+        </label>
+        <label class="flex items-center gap-1.5 cursor-pointer hover:text-white">
+          <input type="checkbox" id="chk-pins" checked class="rounded border-slate-700 bg-slate-800 text-amber-500">
+          <span>構造ピン</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 2. Camera View Presets -->
+    <div class="glass-panel rounded-xl p-3 shadow-xl">
+      <div class="text-[11px] font-bold text-amber-400 uppercase tracking-wider mb-2">
+        📷 観察アングル（視点切替）
+      </div>
+      <div class="grid grid-cols-4 gap-1 text-[11px]">
+        <button data-cam="photo" class="cam-btn col-span-2 py-1.5 px-2 rounded bg-amber-950 border border-amber-600/70 text-amber-200 font-bold hover:bg-amber-900 transition flex items-center justify-center gap-1">
+          <span>📸 写真アングル</span>
+        </button>
+        <button data-cam="front" class="cam-btn py-1.5 px-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-center transition">
+          正面
+        </button>
+        <button data-cam="right" class="cam-btn py-1.5 px-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-center transition">
+          右側面
+        </button>
+        <button data-cam="left" class="cam-btn py-1.5 px-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-center transition">
+          左側面
+        </button>
+        <button data-cam="top" class="cam-btn py-1.5 px-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-center transition">
+          真上
+        </button>
+        <button data-cam="rear" class="cam-btn py-1.5 px-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-center transition">
+          背面
+        </button>
+        <button data-cam="bottom" class="cam-btn py-1.5 px-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-center transition">
+          底面
         </button>
       </div>
     </div>
 
-    <!-- Mode Floating Switcher -->
-    <div class="mode-floating-bar">
-      <div class="mode-btn active" data-mode="chinchilla">
-        <span>🎨</span> リアル毛並み（実物カラー）
+    <!-- 3. Raking Light & Slicer Controls -->
+    <div class="glass-panel rounded-xl p-3 shadow-xl">
+      <div class="text-[11px] font-bold text-amber-400 uppercase tracking-wider mb-2 flex items-center justify-between">
+        <span>💡 斜光ライティング検査（凹凸確認）</span>
       </div>
-      <div class="mode-btn" data-mode="clay">
-        <span>🗿</span> 造形用グレー粘土
-      </div>
-      <div class="mode-btn" data-mode="terracotta">
-        <span>🏺</span> テラコッタ粘土
-      </div>
-      <div class="mode-btn" data-mode="paperclay">
-        <span>⚪</span> 白・石塑粘土風
-      </div>
-      <div class="mode-btn" data-mode="blocking">
-        <span>🧊</span> 構造ブロック分解（アタリ）
-      </div>
-      <div class="mode-btn" data-mode="wireframe">
-        <span>🕸</span> ワイヤーフレーム（面構成）
+      <div class="space-y-2 text-[11px]">
+        <div>
+          <div class="flex justify-between text-slate-400 mb-0.5">
+            <span>光源方位角 (回転)</span>
+            <span id="lbl-light-az" class="text-slate-200 font-mono">45°</span>
+          </div>
+          <input id="slider-light-az" type="range" min="0" max="360" value="45" class="w-full h-1 bg-slate-700 rounded-lg cursor-pointer accent-amber-500">
+        </div>
+        <div>
+          <div class="flex justify-between text-slate-400 mb-0.5">
+            <span>光源の高さ (仰角)</span>
+            <span id="lbl-light-el" class="text-slate-200 font-mono">30°</span>
+          </div>
+          <input id="slider-light-el" type="range" min="5" max="85" value="30" class="w-full h-1 bg-slate-700 rounded-lg cursor-pointer accent-amber-500">
+        </div>
+        <div class="pt-1.5 border-t border-slate-800 flex items-center justify-between">
+          <label class="flex items-center gap-1.5 cursor-pointer text-slate-300">
+            <input type="checkbox" id="chk-slicer" class="rounded border-slate-700 bg-slate-800 text-amber-500">
+            <span>水平断面スライサー</span>
+          </label>
+          <span id="lbl-slice-val" class="text-slate-400 font-mono">100%</span>
+        </div>
+        <input id="slider-slicer" type="range" min="0" max="100" value="100" disabled class="w-full h-1 bg-slate-700 rounded-lg cursor-pointer opacity-40 accent-amber-500">
       </div>
     </div>
 
-    <!-- View Preset Toolbar -->
-    <div class="viewport-controls-bottom">
-      <div class="view-preset-bar">
-        <button class="preset-btn special-photo" data-view="photo">📸 写真と同じアングル</button>
-        <button class="preset-btn" data-view="right">右側面</button>
-        <button class="preset-btn" data-view="front">正面</button>
-        <button class="preset-btn" data-view="left">左側面</button>
-        <button class="preset-btn" data-view="back">背面</button>
-        <button class="preset-btn" data-view="top">上面（見下ろし）</button>
-        <button class="preset-btn" data-view="bottom">底面（足裏接地）</button>
-        <button class="preset-btn" data-view="quarter">斜め前 (3/4)</button>
-        <button class="preset-btn" id="btn-turntable">🔄 ターンテーブル回転</button>
+    <!-- 4. Anatomical Structure Checklist -->
+    <div class="glass-panel rounded-xl p-3 shadow-xl flex-1 flex flex-col min-h-0">
+      <div class="text-[11px] font-bold text-amber-400 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+        <span>📋 部位別 造形ポイント</span>
+        <span class="text-[9px] text-slate-400 font-normal">タップで拡大</span>
       </div>
-    </div>
-  </div>
-
-  <!-- Sidebar: Controls & Sculpting Guide -->
-  <aside id="sidebar-panel">
-    <div class="sidebar-header">
-      <div class="tab-nav">
-        <button class="tab-nav-btn active" data-tab="tab-anatomy">部位別造形ポイント</button>
-        <button class="tab-nav-btn" data-tab="tab-workflow">造形手順＆比率</button>
-        <button class="tab-nav-btn" data-tab="tab-light">ライティング＆断面</button>
+      <div id="anatomy-list" class="space-y-1 overflow-y-auto pr-1 flex-1 text-xs">
+        <!-- Injected via JS -->
       </div>
-    </div>
-
-    <div class="sidebar-content">
-      
-      <!-- TAB 1: Anatomy & Structure Points -->
-      <div class="tab-pane active" id="tab-anatomy">
-        <div class="section-title">📌 各部位の立体外観と造形のコツ</div>
-        <p style="font-size: 0.78rem; color: var(--text-sub); margin-bottom: 12px;">
-          部位をクリックすると3Dカメラが自動でズーム＆フォーカスします。
-        </p>
-
-        <!-- Point 1: Ears -->
-        <div class="point-card" data-pin="1">
-          <div class="point-header">
-            <div class="point-badge">1</div>
-            <div class="point-name">耳（短い立ち耳）</div>
-            <div class="point-subtitle">約4.5〜5cm比率</div>
-          </div>
-          <div class="point-body">
-            ネザーランドドワーフ最大の品種特徴。頭部に対して非常に短く、ピンと直立。先端はわずかに丸みを帯び、付け根の間隔が狭い（ほぼ平行〜浅いV字）。
-          </div>
-          <div class="point-tips">
-            💡 粘土のコツ: 耳が長くなるとミニウサギに見えてしまうため「短すぎるかも？」と感じる程度に抑える。内側を浅くスプーン状に窪ませ、外縁の厚みを残す。
-          </div>
-        </div>
-
-        <!-- Point 2: Crown & Cheeks -->
-        <div class="point-card" data-pin="2">
-          <div class="point-header">
-            <div class="point-badge">2</div>
-            <div class="point-name">頭部（クラウン）＆ 頬</div>
-            <div class="point-subtitle">リンゴ型・短頭種</div>
-          </div>
-          <div class="point-body">
-            頭頂部（耳の間〜額）が丸く盛り上がる「クラウン」。マズル（鼻先）は極端に短く詰まっており、両頬（ウィスカーパッド）が横へぷっくり丸く張り出します。
-          </div>
-          <div class="point-tips">
-            💡 粘土のコツ: 正面から見た時に「ほぼ真ん丸なボールの両脇に小さな球を足した形」。横顔は絶壁に近い急傾斜で鼻先に落ちます。
-          </div>
-        </div>
-
-        <!-- Point 3: Eyes -->
-        <div class="point-card" data-pin="3">
-          <div class="point-header">
-            <div class="point-badge">3</div>
-            <div class="point-name">大きなクリクリの目</div>
-            <div class="point-subtitle">側方突出・アイリング</div>
-          </div>
-          <div class="point-body">
-            頭部の両側面に位置し、正面から見ても球体がしっかり外に飛び出しています。黒目が大きく、目の周囲には淡い白〜クリーム色の毛（アイリング）があります。
-          </div>
-          <div class="point-tips">
-            💡 粘土のコツ: 黒いガラスビーズや硬化済み樹脂粘土球を埋め込むと瞳の光沢が出やすい。目の周囲にヘラで薄い溝を彫り、アイリングの段差を再現。
-          </div>
-        </div>
-
-        <!-- Point 4: Neck & Dewlap -->
-        <div class="point-card" data-pin="4">
-          <div class="point-header">
-            <div class="point-badge">4</div>
-            <div class="point-name">首〜胸元（くびれゼロ）</div>
-            <div class="point-subtitle">マフラー状の肉付き</div>
-          </div>
-          <div class="point-body">
-            顎の下から胸元へ、首のくびれが外見上ほとんど見えません。まるでマフラーを巻いているかのように、頭部が胴体に直接埋まり込むように繋がっています。
-          </div>
-          <div class="point-tips">
-            💡 粘土のコツ: 顎下と胸の間に溝を深く掘りすぎず、首元のたるみ（二重顎のような肉の段）を滑らかな段差として造形すると実物の愛らしさが出ます。
-          </div>
-        </div>
-
-        <!-- Point 5: Spine C-Curve -->
-        <div class="point-card" data-pin="5">
-          <div class="point-header">
-            <div class="point-badge">5</div>
-            <div class="point-name">背中のCカーブ（最重要）</div>
-            <div class="point-subtitle">美しい高アーチ</div>
-          </div>
-          <div class="point-body">
-            お座りポーズの核となるライン。首の後ろから腰に向かって急角度で立ち上がり、腰〜お尻の一番高い位置（全高の最高点）から尻尾へ向けて丸く急降下します。
-          </div>
-          <div class="point-tips">
-            💡 粘土のコツ: 「斜めに置いた大きな卵」。写真の通り、背中の頂点は頭よりもかなり高い位置にきます。ここが平らになるとウサギらしさが失われます。
-          </div>
-        </div>
-
-        <!-- Point 6: Front Paws -->
-        <div class="point-card" data-pin="6">
-          <div class="point-header">
-            <div class="point-badge">6</div>
-            <div class="point-name">垂直に揃えた前足</div>
-            <div class="point-subtitle">胸の直下・平行接地</div>
-          </div>
-          <div class="point-body">
-            胸元の肉のすぐ下から、2本の細い前肢が垂直にピンと下りています。左右の前足の間隔は非常に狭く、ぴったり揃えて前を向いて接地しています。
-          </div>
-          <div class="point-tips">
-            💡 粘土のコツ: 胴体の重みで潰れないよう、針金や爪楊枝を芯にするのが鉄則。足先は指先がほんのりわかる程度の柔らかい丸み。
-          </div>
-        </div>
-
-        <!-- Point 7: Thighs & Hind Feet -->
-        <div class="point-card" data-pin="7">
-          <div class="point-header">
-            <div class="point-badge">7</div>
-            <div class="point-name">大腿部（太もも）＆ 後足</div>
-            <div class="point-subtitle">両脇に張り出す筋肉塊</div>
-          </div>
-          <div class="point-body">
-            座っている時、後肢は折りたたまれて巨大な半球状の太もも肉として胴体の両脇を包み込みます。足裏（足先）は前足の外側〜少し後ろから前へ覗きます。
-          </div>
-          <div class="point-tips">
-            💡 粘土のコツ: 上面から見たときに「ひょうたん型〜洋梨型（頭＜肩＜腰）」になるよう、腰回りの幅を胴体中心部よりも広く盛り付ける。
-          </div>
-        </div>
-
-        <!-- Point 8: Tail -->
-        <div class="point-card" data-pin="8">
-          <div class="point-header">
-            <div class="point-badge">8</div>
-            <div class="point-name">尻尾</div>
-            <div class="point-subtitle">お尻下部にちょこん</div>
-          </div>
-          <div class="point-body">
-            お尻の大きな丸みの最下部に、上向きに密着して収まる小さな房。下側は白色の毛が覗くのが特徴です。
-          </div>
-          <div class="point-tips">
-            💡 粘土のコツ: 大きすぎるとリスのようになってしまうので、小さな涙型を作り、尖った方を上に向けてお尻の割れ目に密着させる。
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 2: Sculpting Workflow & Proportions -->
-      <div class="tab-pane" id="tab-workflow">
-        <div class="section-title">📏 プロポーション比率基準</div>
-        <div style="background: rgba(0,0,0,0.25); border-radius: 8px; padding: 12px; font-size: 0.8rem; line-height: 1.6; margin-bottom: 16px;">
-          <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 4px;">
-            <span>頭部高 vs 胴体高:</span> <strong style="color: var(--accent);">1 : 1.4〜1.6</strong>
-          </div>
-          <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding: 4px 0;">
-            <span>耳の長さ vs 頭部高:</span> <strong style="color: var(--accent);">約 0.45 : 1（極小）</strong>
-          </div>
-          <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding: 4px 0;">
-            <span>頭幅 vs 腰（太もも）幅:</span> <strong style="color: var(--accent);">1 : 1.35</strong>
-          </div>
-          <div style="display: flex; justify-content: space-between; padding-top: 4px;">
-            <span>背中の最高点位置:</span> <strong style="color: var(--accent);">後ろから約1/3の腰部</strong>
-          </div>
-        </div>
-
-        <div class="section-title">🔨 粘土造形 5ステップ実践手順</div>
-
-        <!-- Step 1 -->
-        <div class="workflow-step">
-          <div class="step-marker">1</div>
-          <div class="step-title">芯材（アルミホイル＋針金）の成形</div>
-          <div class="step-desc">
-            軽量化と焼成/乾燥時のひび割れ防止のため、アルミホイルを固く握って「胴体用（斜め卵型）」と「頭部用（球体）」の2つの塊を作ります。針金で2つを串刺しにして接合し、前足の支柱針金を下へ伸ばします。
-          </div>
-        </div>
-
-        <!-- Step 2 -->
-        <div class="workflow-step">
-          <div class="step-marker">2</div>
-          <div class="step-title">ブロック肉付け（基本ボリューム決め）</div>
-          <div class="step-desc">
-            「構造ブロック分解モード」の色分けと同じように、まずは大きな塊で粘土を盛ります。胴体に厚く巻き、両脇に楕円形の太もも塊を貼り付けます。この段階では毛並みや顔は作らず、全体のプロポーションを決めます。
-          </div>
-        </div>
-
-        <!-- Step 3 -->
-        <div class="workflow-step">
-          <div class="step-marker">3</div>
-          <div class="step-title">全方位シルエットの確認と削り出し</div>
-          <div class="step-desc">
-            「正面」「右側面」「上面」「背面」の各視点ボタンを押しながら、作品を回して輪郭をチェックします。特に横からの「背中のCカーブ」と、上からの「洋梨型の横幅」が写真と一致しているかを重点確認します。
-          </div>
-        </div>
-
-        <!-- Step 4 -->
-        <div class="workflow-step">
-          <div class="step-marker">4</div>
-          <div class="step-title">パーツの接合と段差の馴染ませ</div>
-          <div class="step-desc">
-            短い耳、頬の膨らみ、前足、尻尾を取り付けます。スパチュラ（ヘラ）に少量の水や粘土用柔軟液をつけ、頭部と胴体の境界、太ももとお腹の境目を滑らかに一体化させていきます（首のくびれを消すのがポイント）。
-          </div>
-        </div>
-
-        <!-- Step 5 -->
-        <div class="workflow-step">
-          <div class="step-marker">5</div>
-          <div class="step-title">斜光による面の確認とディテール仕上げ</div>
-          <div class="step-desc">
-            「ライティング調整」ツールを使い、横からの強い斜光を当てて表面の歪みや凹凸をチェック。シリコンブラシや針ツールで毛並みの流れ（背中は下向き、顔は放射状）を刻み、目を埋め込んで完成させます。
-          </div>
-        </div>
-
-      </div>
-
-      <!-- TAB 3: Light & Slicing Controls -->
-      <div class="tab-pane" id="tab-light">
-        <div class="section-title">💡 造形検証用・可動ライティング（斜光）</div>
-        <p style="font-size: 0.78rem; color: var(--text-sub); margin-bottom: 14px;">
-          粘土原型師が使う「斜光（横からの光）」をシミュレート。光の角度を動かして表面の凹凸や筋肉の盛り上がりを確認できます。
-        </p>
-
-        <div class="control-row">
-          <label>光の方位角 (水平角度)</label>
-          <div class="range-wrap">
-            <input type="range" id="light-azimuth" min="0" max="360" value="70">
-            <span class="range-val" id="val-azimuth">70°</span>
-          </div>
-        </div>
-
-        <div class="control-row">
-          <label>光の仰角 (垂直高さ)</label>
-          <div class="range-wrap">
-            <input type="range" id="light-elevation" min="5" max="85" value="35">
-            <span class="range-val" id="val-elevation">35°</span>
-          </div>
-        </div>
-
-        <div class="control-row">
-          <label>主光源の強さ</label>
-          <div class="range-wrap">
-            <input type="range" id="light-intensity" min="0.2" max="2.5" step="0.1" value="1.2">
-            <span class="range-val" id="val-intensity">1.2</span>
-          </div>
-        </div>
-
-        <div class="control-row">
-          <label>環境光（陰の明るさ）</label>
-          <div class="range-wrap">
-            <input type="range" id="light-ambient" min="0.1" max="1.0" step="0.05" value="0.4">
-            <span class="range-val" id="val-ambient">0.4</span>
-          </div>
-        </div>
-
-        <div class="section-title" style="margin-top: 24px;">📐 断面スライサー（内部形状・等高線）</div>
-        <p style="font-size: 0.78rem; color: var(--text-sub); margin-bottom: 14px;">
-          モデルをスライスして、各高さにおける外周輪郭線と厚みを確認します。
-        </p>
-
-        <div class="control-row">
-          <label>断面クリッピング有効</label>
-          <label class="toggle-switch">
-            <input type="checkbox" id="toggle-slicer">
-            <span class="slider-toggle"></span>
-          </label>
-        </div>
-
-        <div class="control-row" id="slicer-controls" style="opacity: 0.5; pointer-events: none;">
-          <label>スライス高さ (Y軸)</label>
-          <div class="range-wrap">
-            <input type="range" id="slice-height" min="0" max="2.6" step="0.02" value="1.2">
-            <span class="range-val" id="val-slice">1.2m</span>
-          </div>
-        </div>
-
-        <div class="section-title" style="margin-top: 24px;">👁 表示補助ガイド</div>
-        
-        <div class="control-row">
-          <label>3D造形ピンの表示</label>
-          <label class="toggle-switch">
-            <input type="checkbox" id="toggle-pins" checked>
-            <span class="slider-toggle"></span>
-          </label>
-        </div>
-
-        <div class="control-row">
-          <label>地面グリッド（寸法目安）</label>
-          <label class="toggle-switch">
-            <input type="checkbox" id="toggle-grid" checked>
-            <span class="slider-toggle"></span>
-          </label>
-        </div>
-
-        <div class="control-row">
-          <label>緑のクッション台座</label>
-          <label class="toggle-switch">
-            <input type="checkbox" id="toggle-cushion" checked>
-            <span class="slider-toggle"></span>
-          </label>
-        </div>
-
-        <div class="control-row">
-          <label>左右対称基準面（正中面）</label>
-          <label class="toggle-switch">
-            <input type="checkbox" id="toggle-symmetry">
-            <span class="slider-toggle"></span>
-          </label>
-        </div>
-
-      </div>
-
     </div>
   </aside>
 
-  <!-- Application Logic -->
+  <!-- Bottom Drawer for Active Pin Details -->
+  <div id="pin-card" class="absolute bottom-3 left-3 right-3 md:left-88 md:right-6 z-20 glass-panel border border-amber-500/50 rounded-xl p-3.5 shadow-2xl transition-all duration-300 translate-y-36 opacity-0 pointer-events-none">
+    <div class="flex items-start justify-between">
+      <div class="flex items-center gap-2">
+        <span id="card-num" class="w-5 h-5 rounded-full bg-amber-500 text-slate-950 font-bold text-xs flex items-center justify-center">1</span>
+        <div>
+          <h3 id="card-name" class="font-bold text-white text-xs md:text-sm">部位名</h3>
+          <p id="card-sub" class="text-[10px] text-amber-300 font-mono">Structure</p>
+        </div>
+      </div>
+      <button id="card-close-btn" class="text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800 text-xs">✕</button>
+    </div>
+    <div class="mt-2 text-xs grid md:grid-cols-2 gap-2 text-slate-300 leading-relaxed">
+      <div id="card-desc" class="bg-slate-950/60 p-2 rounded-lg border border-slate-800 text-[11px]"></div>
+      <div id="card-tip" class="bg-amber-950/40 p-2 rounded-lg border border-amber-800/40 text-amber-200 text-[11px]"></div>
+    </div>
+  </div>
+
+  <!-- Instruction badge -->
+  <div id="hint-badge" class="absolute top-14 right-3 z-10 glass-panel text-slate-300 text-[11px] px-3 py-1.5 rounded-full border border-slate-700 pointer-events-none transition-opacity duration-500 flex items-center gap-1.5">
+    <span>🖱️ ドラッグ: 360°回転 | ホイール: ズーム | 右ドラッグ: 平行移動</span>
+  </div>
+
   <script>
-    // --- 1. Scene, Camera, Renderer Setup ---
-    const container = document.getElementById('viewport-container');
-    const canvas = document.getElementById('three-canvas');
-    const pinsContainer = document.getElementById('pins-container');
+    /* =========================================================================
+       THREE.JS NETHERLAND DWARF RABBIT SCULPTURE VIEWER
+       ========================================================================= */
 
+    const ANATOMY_ITEMS = [
+      {
+        id: 'ear',
+        num: 1,
+        name: '耳（短い直立丸耳）',
+        sub: 'Short Erect Rounded Ears',
+        pos: [0.12, 1.62, 0.05],
+        camPos: [1.1, 1.8, 1.2],
+        lookAt: [0.1, 1.45, 0.1],
+        desc: 'ネザーランドドワーフ最大のアイデンティティ。成体でも約5cm以下と非常に短く、頭部頂点で互いに寄り添うように直立。先端は尖らず丸いスプーン状で、縁に黒い毛のラインが入ります。',
+        tip: '【粘土造形】頭部球体に対して耳を長くしすぎないこと。耳の高さは頭部全高の約0.4〜0.45倍が黄金比です。'
+      },
+      {
+        id: 'head',
+        num: 2,
+        name: '頭部・短マズル（球状の丸頭）',
+        sub: 'Spherical Compact Skull & Flat Face',
+        pos: [0.26, 1.25, 0.42],
+        camPos: [1.3, 1.35, 1.2],
+        lookAt: [0.05, 1.2, 0.3],
+        desc: '横から見るとほぼきれいな円を描く、極めて短く詰まったマズル（鼻口部）。額から鼻先にかけての凹凸（ストップ）が平坦で、愛らしいおまんじゅう型です。',
+        tip: '【粘土造形】芯材の段階でアルミホイルを真球に近い形に固めます。犬猫のような鼻先の突き出しは作らず、丸い頭に平たく鼻口部を埋め込みます。'
+      },
+      {
+        id: 'cheek',
+        num: 3,
+        name: '頬袋・ほっぺ（下膨れのふくらみ）',
+        sub: 'Plump Zygomatic Cheek Pads',
+        pos: [0.38, 1.12, 0.30],
+        camPos: [1.2, 1.1, 1.0],
+        lookAt: [0.0, 1.1, 0.2],
+        desc: '正面から見たときに横へ大きく張り出す豊かな頬毛のボリューム。首の境界を隠すほど膨らみ、正面シルエットをおにぎり型に見せています。',
+        tip: '【粘土造形】目の斜め下からアゴにかけて左右均等に粘土玉を盛り、頭の球体とスムーズに繋ぎ合わせて下膨れを作ります。'
+      },
+      {
+        id: 'eye',
+        num: 4,
+        name: '大きな黒目（側面に張り出す球体）',
+        sub: 'Bulbous Dark Eyes & Lighter Eye Ring',
+        pos: [0.32, 1.28, 0.28],
+        camPos: [0.8, 1.35, 0.8],
+        lookAt: [0.2, 1.25, 0.2],
+        desc: '頭部側面に半球状に飛び出す漆黒の瞳。周囲に淡いアイリング毛があり、立体的な瞳の丸みが強調されます。',
+        tip: '【粘土造形】市販の黒ガラスカボションやオニキスビーズを埋め込むか、造形後にUVレジンを盛ると濡れたような瑞々しい輝きが再現できます。'
+      },
+      {
+        id: 'chest',
+        num: 5,
+        name: '首なしマフラー・胸元の肉付き',
+        sub: 'Dewlap & Neckless Seamless Chest',
+        pos: [0.15, 0.85, 0.42],
+        camPos: [1.3, 0.9, 1.2],
+        lookAt: [0.0, 0.8, 0.25],
+        desc: '首のくびれが外見上ほとんどなく、アゴ下からそのまま豊かな胸元の白毛へと繋がります。マフラーを巻いたような丸みがあります。',
+        tip: '【粘土造形】頭部と胴体を接合する際、アゴ下の隙間をしっかり粘土で埋め、首を作らずなだらかなスロープで胸へと繋げます。'
+      },
+      {
+        id: 'back',
+        num: 6,
+        name: '背中の急激なCカーブ（ハイアーチ）',
+        sub: 'Prominent High-Arched Dorsal Curve',
+        pos: [-0.02, 1.22, -0.15],
+        camPos: [1.9, 1.3, -0.2],
+        lookAt: [0.0, 0.9, -0.05],
+        desc: '首の後ろから腰・お尻へと一気に立ち上がる、美しい半円状の弧（ハイアーチ）。お座り時のネザーランド特有の「お団子シルエット」の要です。',
+        tip: '【粘土造形】右側面（真横）から透かして見て、背中の最も高い部分が頭頂部とほぼ同じかやや高くなるように盛り上げます。'
+      },
+      {
+        id: 'thigh',
+        num: 7,
+        name: '折りたたまれた太もも（大腿部の塊）',
+        sub: 'Tucked Massive Hindquarters',
+        pos: [0.38, 0.52, -0.1],
+        camPos: [1.4, 0.65, 0.2],
+        lookAt: [0.1, 0.5, -0.1],
+        desc: 'お座り姿勢では力強い後足が胴体の両サイドに完全に折りたたまれ、大きな半球状の肉塊となってお座りの安定した土台を形成します。',
+        tip: '【粘土造形】胴体中心の卵型芯材の両脇に、大きめの粘土の塊を「太もも」として左右対称に貼り付けて一体化させます。'
+      },
+      {
+        id: 'foreleg',
+        num: 8,
+        name: '垂直に揃えた前足',
+        sub: 'Parallel Upright Forelegs',
+        pos: [0.12, 0.25, 0.35],
+        camPos: [0.9, 0.35, 1.3],
+        lookAt: [0.05, 0.25, 0.3],
+        desc: '胸の真下から地面に向かって2本が平行に真っ直ぐ伸びる前足。足先は座布団の上にちょこんと前向きに接地します。',
+        tip: '【粘土造形】前足を長く作りすぎると立位ポーズになってしまいます。短めに抑え、胴体底面と座布団との隙間を小さくします。'
+      }
+    ];
+
+    // Block-in color coding
+    const BLOCK_COLORS = {
+      head: 0xff6b6b,     // Coral Red
+      cheeks: 0xff8e8e,   // Light Coral
+      ears: 0xffd166,     // Yellow Gold
+      eyes: 0x1e293b,     // Dark Slate
+      torso: 0x4cc9f0,    // Sky Blue
+      chest: 0x4895ef,    // Royal Blue
+      thighs: 0xf77f00,   // Amber Orange
+      forelegs: 0x06d6a0, // Mint Green
+      feet: 0x118ab2,     // Ocean Blue
+      tail: 0x9d4edd,     // Purple
+      cushion: 0x468739   // Green
+    };
+
+    const container = document.getElementById('canvas-container');
+    const pinsOverlay = document.getElementById('pins-overlay');
+
+    // 1. Scene & Camera Setup
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x13161c);
+    scene.background = new THREE.Color(0x0a0f1d);
 
-    const camera = new THREE.PerspectiveCamera(42, container.clientWidth / container.clientHeight, 0.1, 100);
-    camera.position.set(2.8, 1.6, 2.2);
+    const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 50);
+    // Initial camera position matches the photo perspective (diagonal right-front)
+    camera.position.set(2.2, 1.5, 2.1);
 
-    const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, preserveDrawingBuffer: true });
-    renderer.setSize(container.clientWidth, container.clientHeight);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true, powerPreference: 'high-performance' });
+    renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.localClippingEnabled = true;
+    container.appendChild(renderer.domElement);
 
-    const controls = new THREE.OrbitControls(camera, canvas);
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.06;
-    controls.target.set(0, 0.95, 0);
-    controls.maxPolarAngle = Math.PI * 0.52;
-    controls.minDistance = 1.2;
-    controls.maxDistance = 8.0;
+    controls.maxDistance = 6.0;
+    controls.minDistance = 0.8;
+    controls.target.set(0, 0.82, 0.1);
+    controls.update();
 
-    // --- 2. Lighting Setup ---
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    // 2. Lighting Setup
+    const ambientLight = new THREE.AmbientLight(0xdce7f5, 0.7);
     scene.add(ambientLight);
 
-    const mainLight = new THREE.DirectionalLight(0xfff7ea, 1.2);
-    mainLight.castShadow = true;
-    mainLight.shadow.mapSize.width = 2048;
-    mainLight.shadow.mapSize.height = 2048;
-    mainLight.shadow.bias = -0.0005;
-    mainLight.shadow.camera.near = 0.5;
-    mainLight.shadow.camera.far = 15;
-    mainLight.shadow.camera.left = -2.5;
-    mainLight.shadow.camera.right = 2.5;
-    mainLight.shadow.camera.top = 2.5;
-    mainLight.shadow.camera.bottom = -1.5;
-    scene.add(mainLight);
+    // Sculptor Key Light (Directional, movable)
+    const keyLight = new THREE.DirectionalLight(0xfff6ea, 1.35);
+    keyLight.position.set(2.4, 2.0, 2.4);
+    keyLight.castShadow = true;
+    keyLight.shadow.mapSize.width = 2048;
+    keyLight.shadow.mapSize.height = 2048;
+    keyLight.shadow.camera.near = 0.5;
+    keyLight.shadow.camera.far = 8;
+    const shadowD = 1.6;
+    keyLight.shadow.camera.left = -shadowD;
+    keyLight.shadow.camera.right = shadowD;
+    keyLight.shadow.camera.top = shadowD;
+    keyLight.shadow.camera.bottom = -shadowD;
+    keyLight.shadow.bias = -0.0004;
+    scene.add(keyLight);
 
-    const fillLight = new THREE.DirectionalLight(0xb4c8e1, 0.35);
-    fillLight.position.set(-2, 1.5, -2);
+    // Cool fill light from opposite side
+    const fillLight = new THREE.DirectionalLight(0x93c5fd, 0.45);
+    fillLight.position.set(-2.2, 1.4, -1.8);
     scene.add(fillLight);
 
-    const rimLight = new THREE.DirectionalLight(0xffffff, 0.4);
-    rimLight.position.set(0, 3, -3);
-    scene.add(rimLight);
+    // Green bounce reflection from the cushion
+    const bounceLight = new THREE.DirectionalLight(0x86efac, 0.25);
+    bounceLight.position.set(0, -2, 0);
+    scene.add(bounceLight);
 
-    function updateLightPosition() {
-      const az = parseFloat(document.getElementById('light-azimuth').value) * Math.PI / 180;
-      const el = parseFloat(document.getElementById('light-elevation').value) * Math.PI / 180;
-      const radius = 5.0;
-      const x = radius * Math.cos(el) * Math.sin(az);
-      const y = radius * Math.sin(el);
-      const z = radius * Math.cos(el) * Math.cos(az);
-      mainLight.position.set(x, y, z);
-    }
-    updateLightPosition();
+    // Slicer horizontal clipping plane
+    const clipPlane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 5.0); // initially unclipped
 
-    // --- 3. Slicing Plane ---
-    const clipPlane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 1.2);
-    renderer.clippingPlanes = [];
+    function createChinchillaFurTexture() {
+      const c = document.createElement('canvas');
+      c.width = 512;
+      c.height = 512;
+      const ctx = c.getContext('2d');
 
-    // --- 4. Material Definitions ---
-    function createFurTexture() {
-      const size = 512;
-      const texCanvas = document.createElement('canvas');
-      texCanvas.width = size;
-      texCanvas.height = size;
-      const ctx = texCanvas.getContext('2d');
+      // Base coat: soft medium grey
+      ctx.fillStyle = '#8e9399';
+      ctx.fillRect(0, 0, 512, 512);
 
-      ctx.fillStyle = '#8a8e94';
-      ctx.fillRect(0, 0, size, size);
-
-      for (let i = 0; i < 60000; i++) {
-        const x = Math.random() * size;
-        const y = Math.random() * size;
-        const v = Math.random();
-        if (v < 0.35) {
-          ctx.fillStyle = 'rgba(20, 22, 25, 0.4)';
-        } else if (v < 0.7) {
-          ctx.fillStyle = 'rgba(240, 242, 245, 0.45)';
+      // Fine salt-and-pepper agouti hair specks
+      for (let i = 0; i < 40000; i++) {
+        const x = Math.random() * 512;
+        const y = Math.random() * 512;
+        const r = Math.random();
+        if (r < 0.35) {
+          ctx.fillStyle = 'rgba(25, 28, 35, 0.45)'; // dark guard hair
+        } else if (r < 0.72) {
+          ctx.fillStyle = 'rgba(245, 247, 250, 0.55)'; // silver hair
         } else {
-          ctx.fillStyle = 'rgba(110, 114, 120, 0.35)';
+          ctx.fillStyle = 'rgba(165, 155, 140, 0.35)'; // warm agouti brown undertone
         }
-        ctx.fillRect(x, y, 1.5, 2.5);
+        ctx.fillRect(x, y, 1.2, 1.2);
       }
-      const tex = new THREE.CanvasTexture(texCanvas);
+
+      // Soft vertical fur directional streaks
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.07)';
+      for (let i = 0; i < 70; i++) {
+        const x = Math.random() * 512;
+        ctx.fillRect(x, 0, Math.random() * 3 + 1, 512);
+      }
+
+      const tex = new THREE.CanvasTexture(c);
       tex.wrapS = THREE.RepeatWrapping;
       tex.wrapT = THREE.RepeatWrapping;
-      tex.repeat.set(4, 4);
+      tex.repeat.set(3, 3);
       return tex;
     }
 
-    const furMap = createFurTexture();
+    const furTex = createChinchillaFurTexture();
 
-    const materials = {
-      chinchilla: {
+    // Material Library
+    const mats = {
+      fur: {
         body: new THREE.MeshStandardMaterial({
-          map: furMap,
-          color: 0x82878e,
+          map: furTex,
+          color: 0x9fa4a9,
           roughness: 0.85,
-          metalness: 0.05,
+          metalness: 0.03,
           clippingPlanes: [clipPlane],
           clipShadows: true
         }),
-        chest: new THREE.MeshStandardMaterial({
-          color: 0xdcdde0,
+        white: new THREE.MeshStandardMaterial({
+          color: 0xedf0f5,
           roughness: 0.9,
-          clippingPlanes: [clipPlane]
-        }),
-        ears: new THREE.MeshStandardMaterial({
-          map: furMap,
-          color: 0x767b82,
-          roughness: 0.8,
           clippingPlanes: [clipPlane]
         }),
         earInner: new THREE.MeshStandardMaterial({
-          color: 0xdfc9c2,
+          color: 0xdfbcba,
+          roughness: 0.92,
+          clippingPlanes: [clipPlane]
+        }),
+        earRim: new THREE.MeshStandardMaterial({
+          color: 0x22262d,
           roughness: 0.85,
           clippingPlanes: [clipPlane]
         }),
-        earTip: new THREE.MeshStandardMaterial({
-          color: 0x222428,
-          roughness: 0.85,
-          clippingPlanes: [clipPlane]
-        }),
-        eye: new THREE.MeshStandardMaterial({
-          color: 0x050508,
-          roughness: 0.08,
-          metalness: 0.9,
-          clippingPlanes: [clipPlane]
+        eye: new THREE.MeshPhysicalMaterial({
+          color: 0x05070a,
+          roughness: 0.04,
+          metalness: 0.1,
+          transmission: 0.05,
+          clearcoat: 1.0,
+          clearcoatRoughness: 0.05
         }),
         eyeRing: new THREE.MeshStandardMaterial({
-          color: 0xd6d8dc,
-          roughness: 0.9,
-          clippingPlanes: [clipPlane]
+          color: 0xd8dde4,
+          roughness: 0.9
         }),
         nose: new THREE.MeshStandardMaterial({
-          color: 0x9e8884,
-          roughness: 0.7,
-          clippingPlanes: [clipPlane]
-        }),
-        paws: new THREE.MeshStandardMaterial({
-          color: 0xdcdfe4,
-          roughness: 0.9,
-          clippingPlanes: [clipPlane]
+          color: 0x475569,
+          roughness: 0.75
         })
       },
-      clay: new THREE.MeshStandardMaterial({
-        color: 0x8e929a,
-        roughness: 0.65,
-        metalness: 0.08,
-        clippingPlanes: [clipPlane],
-        clipShadows: true
-      }),
-      terracotta: new THREE.MeshStandardMaterial({
-        color: 0xb56345,
-        roughness: 0.72,
-        metalness: 0.05,
-        clippingPlanes: [clipPlane],
-        clipShadows: true
-      }),
-      paperclay: new THREE.MeshStandardMaterial({
-        color: 0xe8e6e1,
-        roughness: 0.78,
-        metalness: 0.02,
-        clippingPlanes: [clipPlane],
-        clipShadows: true
-      }),
-      blocking: {
-        head: new THREE.MeshStandardMaterial({ color: 0xffcc33, roughness: 0.5, clippingPlanes: [clipPlane] }),
-        cheeks: new THREE.MeshStandardMaterial({ color: 0xff9933, roughness: 0.5, clippingPlanes: [clipPlane] }),
-        ears: new THREE.MeshStandardMaterial({ color: 0xff5577, roughness: 0.5, clippingPlanes: [clipPlane] }),
-        torso: new THREE.MeshStandardMaterial({ color: 0x3399ee, roughness: 0.5, clippingPlanes: [clipPlane] }),
-        thighs: new THREE.MeshStandardMaterial({ color: 0x22cc77, roughness: 0.5, clippingPlanes: [clipPlane] }),
-        frontLegs: new THREE.MeshStandardMaterial({ color: 0x9955dd, roughness: 0.5, clippingPlanes: [clipPlane] }),
-        paws: new THREE.MeshStandardMaterial({ color: 0x7744aa, roughness: 0.5, clippingPlanes: [clipPlane] }),
-        hindFeet: new THREE.MeshStandardMaterial({ color: 0x1188bb, roughness: 0.5, clippingPlanes: [clipPlane] }),
-        tail: new THREE.MeshStandardMaterial({ color: 0xff77aa, roughness: 0.5, clippingPlanes: [clipPlane] }),
-        dewlap: new THREE.MeshStandardMaterial({ color: 0x55bbcc, roughness: 0.5, clippingPlanes: [clipPlane] })
-      }
+      clay: {
+        body: new THREE.MeshStandardMaterial({
+          color: 0x8892a0,
+          roughness: 0.65,
+          metalness: 0.0,
+          clippingPlanes: [clipPlane],
+          clipShadows: true
+        }),
+        eye: new THREE.MeshStandardMaterial({
+          color: 0x1e293b,
+          roughness: 0.3
+        })
+      },
+      terracotta: {
+        body: new THREE.MeshStandardMaterial({
+          color: 0xb45309,
+          roughness: 0.75,
+          metalness: 0.0,
+          clippingPlanes: [clipPlane],
+          clipShadows: true
+        }),
+        eye: new THREE.MeshStandardMaterial({
+          color: 0x451a03,
+          roughness: 0.35
+        })
+      },
+      blockin: {}
     };
 
-    // --- 5. Construct 3D Model ---
-    const rabbitGroup = new THREE.Group();
-    scene.add(rabbitGroup);
+    // Populate Block-in materials
+    for (let k in BLOCK_COLORS) {
+      mats.blockin[k] = new THREE.MeshStandardMaterial({
+        color: BLOCK_COLORS[k],
+        roughness: 0.5,
+        clippingPlanes: [clipPlane],
+        clipShadows: true
+      });
+    }
 
-    const meshCatalog = {
-      head: [],
-      cheeks: [],
-      ears: [],
-      earInner: [],
-      earTip: [],
-      eyes: [],
-      eyeRings: [],
-      nose: [],
-      dewlap: [],
-      torso: [],
-      chest: [],
-      thighs: [],
-      frontLegs: [],
-      frontPaws: [],
-      hindFeet: [],
-      tail: []
-    };
+    // List of all rabbit meshes for material swapping
+    const rabbitMeshRegistry = [];
 
-    // Torso with C-curve
-    function createTorsoMesh() {
-      const geom = new THREE.SphereGeometry(1.0, 36, 28);
-      const pos = geom.attributes.position;
-
-      for (let i = 0; i < pos.count; i++) {
-        let x = pos.getX(i);
-        let y = pos.getY(i);
-        let z = pos.getZ(i);
-
-        let normY = (y + 1) * 0.5;
-        let spineArch = Math.sin(normY * Math.PI) * 0.45;
-        z += (normY > 0.4 ? -spineArch * 0.9 : spineArch * 0.5);
-
-        let widthScale = 0.85 + (1.0 - normY) * 0.45;
-        x *= widthScale;
-
-        if (normY < 0.15) {
-          y = -0.85 + normY * 0.1;
-        }
-
-        pos.setXYZ(i, x * 1.15, (y + 0.85) * 1.05 + 0.1, z * 1.25);
-      }
-      geom.computeVertexNormals();
-
-      const mesh = new THREE.Mesh(geom, materials.chinchilla.body);
-      mesh.position.set(0, 0, -0.1);
+    function registerMesh(mesh, category) {
       mesh.castShadow = true;
       mesh.receiveShadow = true;
-      rabbitGroup.add(mesh);
-      meshCatalog.torso.push(mesh);
+      rabbitMeshRegistry.push({ mesh, category });
       return mesh;
     }
-    createTorsoMesh();
 
-    // Chest fluff
-    const chestGeom = new THREE.SphereGeometry(0.55, 24, 20);
-    chestGeom.scale(1.0, 1.2, 0.75);
-    const chestMesh = new THREE.Mesh(chestGeom, materials.chinchilla.chest);
-    chestMesh.position.set(0, 0.9, 0.48);
-    chestMesh.rotation.x = -0.2;
-    chestMesh.castShadow = true;
-    rabbitGroup.add(chestMesh);
-    meshCatalog.chest.push(chestMesh);
+    const rabbitRoot = new THREE.Group();
+    scene.add(rabbitRoot);
 
-    // Dewlap fold
-    const dewlapGeom = new THREE.CylinderGeometry(0.48, 0.55, 0.25, 24);
-    dewlapGeom.scale(1.2, 1.0, 0.9);
-    const dewlapMesh = new THREE.Mesh(dewlapGeom, materials.chinchilla.body);
-    dewlapMesh.position.set(0, 1.15, 0.42);
-    dewlapMesh.rotation.x = -0.3;
-    dewlapMesh.castShadow = true;
-    rabbitGroup.add(dewlapMesh);
-    meshCatalog.dewlap.push(dewlapMesh);
+    /* 1. TORSO (Compact, rounded sitting egg volume with prominent C-curve back) */
+    const torsoG = new THREE.Group();
+    torsoG.position.set(0, 0.72, -0.05);
+    torsoG.rotation.x = -0.32; // tilted sitting angle
+    rabbitRoot.add(torsoG);
 
-    // Head Group
-    const headGroup = new THREE.Group();
-    headGroup.position.set(0, 1.35, 0.45);
-    rabbitGroup.add(headGroup);
+    // Main torso sphere scaled into an egg
+    const torsoMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(0.55, 36, 32),
+      mats.fur.body
+    );
+    torsoMesh.scale.set(0.92, 1.15, 1.28);
+    registerMesh(torsoMesh, 'torso');
+    torsoG.add(torsoMesh);
 
-    function createHeadMesh() {
-      const geom = new THREE.SphereGeometry(0.68, 36, 28);
-      const pos = geom.attributes.position;
+    // Dorsal hump mesh to form the smooth high C-curve spine
+    const backHump = new THREE.Mesh(
+      new THREE.SphereGeometry(0.46, 32, 28),
+      mats.fur.body
+    );
+    backHump.position.set(0, 0.22, -0.18);
+    backHump.scale.set(0.85, 1.05, 1.1);
+    registerMesh(backHump, 'torso');
+    torsoG.add(backHump);
 
-      for (let i = 0; i < pos.count; i++) {
-        let x = pos.getX(i);
-        let y = pos.getY(i);
-        let z = pos.getZ(i);
+    /* 2. CHEST & DEWLAP (Continuous neckless volume) */
+    const chestMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(0.38, 32, 28),
+      mats.fur.body
+    );
+    chestMesh.position.set(0, 0.76, 0.26);
+    chestMesh.scale.set(0.9, 1.05, 0.95);
+    chestMesh.rotation.x = 0.2;
+    registerMesh(chestMesh, 'chest');
+    rabbitRoot.add(chestMesh);
 
-        if (z < -0.2) z *= 0.85;
+    // Pale fur bib on chest
+    const chestBib = new THREE.Mesh(
+      new THREE.SphereGeometry(0.32, 28, 24),
+      mats.fur.white
+    );
+    chestBib.position.set(0, 0.70, 0.42);
+    chestBib.scale.set(0.72, 0.95, 0.45);
+    registerMesh(chestBib, 'chest');
+    rabbitRoot.add(chestBib);
 
-        if (y < 0.1 && y > -0.5 && z > -0.2) {
-          const cheekFactor = Math.exp(-(y * y) / 0.12);
-          x *= (1.0 + 0.32 * cheekFactor);
-        }
+    /* 3. HEAD GROUP (Compact round skull, full cheeks, short muzzle) */
+    const headG = new THREE.Group();
+    headG.position.set(0, 1.24, 0.22);
+    rabbitRoot.add(headG);
 
-        if (z > 0.35 && y < 0.15) {
-          x *= 0.82;
-          z = 0.35 + (z - 0.35) * 0.65;
-        }
+    // Round head sphere
+    const headMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(0.38, 36, 32),
+      mats.fur.body
+    );
+    headMesh.scale.set(0.95, 0.92, 1.02);
+    registerMesh(headMesh, 'head');
+    headG.add(headMesh);
 
-        if (y > 0.2 && z > -0.1) {
-          y *= 1.08;
-        }
+    // Chubby Full Cheeks (Right & Left)
+    const cheekGeo = new THREE.SphereGeometry(0.24, 28, 24);
+    cheekGeo.scale(1.1, 0.88, 1.0);
 
-        pos.setXYZ(i, x, y, z);
-      }
-      geom.computeVertexNormals();
+    const rightCheek = new THREE.Mesh(cheekGeo, mats.fur.body);
+    rightCheek.position.set(0.22, -0.1, 0.08);
+    registerMesh(rightCheek, 'cheeks');
+    headG.add(rightCheek);
 
-      const mesh = new THREE.Mesh(geom, materials.chinchilla.body);
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-      headGroup.add(mesh);
-      meshCatalog.head.push(mesh);
+    const leftCheek = new THREE.Mesh(cheekGeo, mats.fur.body);
+    leftCheek.position.set(-0.22, -0.1, 0.08);
+    registerMesh(leftCheek, 'cheeks');
+    headG.add(leftCheek);
+
+    // Short Muzzle & Whisker pads
+    const muzzleMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(0.18, 28, 24),
+      mats.fur.body
+    );
+    muzzleMesh.position.set(0, -0.12, 0.28);
+    muzzleMesh.scale.set(0.9, 0.8, 1.08);
+    registerMesh(muzzleMesh, 'head');
+    headG.add(muzzleMesh);
+
+    // Little dark nose
+    const noseMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(0.045, 16, 16),
+      mats.fur.nose
+    );
+    noseMesh.position.set(0, -0.06, 0.45);
+    noseMesh.scale.set(1.0, 0.7, 0.7);
+    registerMesh(noseMesh, 'head');
+    headG.add(noseMesh);
+
+    /* 4. LARGE BULBOUS EYES (Lateral facing) */
+    const eyeGeo = new THREE.SphereGeometry(0.082, 28, 28);
+    const ringGeo = new THREE.TorusGeometry(0.084, 0.012, 16, 32);
+
+    // Right Eye & Ring
+    const rightEye = new THREE.Mesh(eyeGeo, mats.fur.eye);
+    rightEye.position.set(0.30, 0.07, 0.12);
+    registerMesh(rightEye, 'eyes');
+    headG.add(rightEye);
+
+    const rightRing = new THREE.Mesh(ringGeo, mats.fur.eyeRing);
+    rightRing.position.copy(rightEye.position);
+    rightRing.rotation.y = 1.35;
+    registerMesh(rightRing, 'eyes');
+    headG.add(rightRing);
+
+    // Left Eye & Ring
+    const leftEye = new THREE.Mesh(eyeGeo, mats.fur.eye);
+    leftEye.position.set(-0.30, 0.07, 0.12);
+    registerMesh(leftEye, 'eyes');
+    headG.add(leftEye);
+
+    const leftRing = new THREE.Mesh(ringGeo, mats.fur.eyeRing);
+    leftRing.position.copy(leftEye.position);
+    leftRing.rotation.y = -1.35;
+    registerMesh(leftRing, 'eyes');
+    headG.add(leftRing);
+
+    /* 5. SHORT ERECT EARS (Solid, smooth rounded spoons) */
+    function buildEar(isRight) {
+      const ear = new THREE.Group();
+      const sign = isRight ? 1 : -1;
+
+      // Outer ear curved body
+      const outerMesh = new THREE.Mesh(
+        new THREE.SphereGeometry(0.13, 24, 24),
+        mats.fur.body
+      );
+      outerMesh.scale.set(0.7, 1.85, 0.45);
+      outerMesh.position.set(0, 0.22, 0);
+      registerMesh(outerMesh, 'ears');
+      ear.add(outerMesh);
+
+      // Inner concave cavity (pinkish fur)
+      const innerMesh = new THREE.Mesh(
+        new THREE.SphereGeometry(0.11, 20, 20),
+        mats.fur.earInner
+      );
+      innerMesh.scale.set(0.55, 1.6, 0.3);
+      innerMesh.position.set(0, 0.21, 0.035);
+      registerMesh(innerMesh, 'ears');
+      ear.add(innerMesh);
+
+      // Dark fur piping along the top edge
+      const tipMesh = new THREE.Mesh(
+        new THREE.SphereGeometry(0.088, 16, 16),
+        mats.fur.earRim
+      );
+      tipMesh.scale.set(0.68, 0.5, 0.42);
+      tipMesh.position.set(0, 0.41, 0);
+      registerMesh(tipMesh, 'ears');
+      ear.add(tipMesh);
+
+      // Positioning on the skull: short, erect, slight V-angle
+      ear.position.set(sign * 0.12, 0.32, -0.05);
+      ear.rotation.z = sign * -0.15; // subtle V-spread
+      ear.rotation.x = -0.08;
+      ear.rotation.y = sign * 0.12;
+      return ear;
     }
-    createHeadMesh();
+    headG.add(buildEar(true));
+    headG.add(buildEar(false));
 
-    // Cheeks
-    [-1, 1].forEach(side => {
-      const cheekGeom = new THREE.SphereGeometry(0.32, 20, 16);
-      cheekGeom.scale(1.1, 0.95, 1.1);
-      const cheekMesh = new THREE.Mesh(cheekGeom, materials.chinchilla.body);
-      cheekMesh.position.set(side * 0.44, -0.12, 0.2);
-      cheekMesh.castShadow = true;
-      headGroup.add(cheekMesh);
-      meshCatalog.cheeks.push(cheekMesh);
-    });
+    /* 6. TUCKED THIGHS (Massive lateral hindquarter volumes) */
+    const thighGeo = new THREE.SphereGeometry(0.42, 32, 28);
+    thighGeo.scale(0.65, 0.95, 1.25);
 
-    // Nose
-    const noseGeom = new THREE.SphereGeometry(0.12, 16, 12);
-    noseGeom.scale(1.2, 0.8, 1.0);
-    const noseMesh = new THREE.Mesh(noseGeom, materials.chinchilla.nose);
-    noseMesh.position.set(0, -0.18, 0.62);
-    headGroup.add(noseMesh);
-    meshCatalog.nose.push(noseMesh);
+    const rightThigh = new THREE.Mesh(thighGeo, mats.fur.body);
+    rightThigh.position.set(0.36, 0.46, -0.12);
+    rightThigh.rotation.set(-0.25, 0.12, 0.2);
+    registerMesh(rightThigh, 'thighs');
+    rabbitRoot.add(rightThigh);
 
-    // Eyes
-    [-1, 1].forEach(side => {
-      const eyeGeom = new THREE.SphereGeometry(0.14, 24, 20);
-      const eyeMesh = new THREE.Mesh(eyeGeom, materials.chinchilla.eye);
-      eyeMesh.position.set(side * 0.52, 0.05, 0.28);
-      eyeMesh.castShadow = true;
-      headGroup.add(eyeMesh);
-      meshCatalog.eyes.push(eyeMesh);
+    const leftThigh = new THREE.Mesh(thighGeo, mats.fur.body);
+    leftThigh.position.set(-0.36, 0.46, -0.12);
+    leftThigh.rotation.set(-0.25, -0.12, -0.2);
+    registerMesh(leftThigh, 'thighs');
+    rabbitRoot.add(leftThigh);
 
-      const ringGeom = new THREE.TorusGeometry(0.145, 0.025, 12, 24);
-      const ringMesh = new THREE.Mesh(ringGeom, materials.chinchilla.eyeRing);
-      ringMesh.position.copy(eyeMesh.position);
-      ringMesh.rotation.y = side * Math.PI * 0.45;
-      ringMesh.rotation.x = 0.1;
-      headGroup.add(ringMesh);
-      meshCatalog.eyeRings.push(ringMesh);
-    });
+    /* 7. FORELEGS & FRONT PAWS (Vertical upright parallel pillars) */
+    function buildForeleg(isRight) {
+      const leg = new THREE.Group();
+      const sign = isRight ? 1 : -1;
 
-    // Ears
-    [-1, 1].forEach(side => {
-      const earGroup = new THREE.Group();
-      earGroup.position.set(side * 0.22, 0.58, -0.06);
-      earGroup.rotation.z = -side * 0.16;
-      earGroup.rotation.x = -0.06;
+      // Leg pillar
+      const legMesh = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.08, 0.09, 0.38, 24),
+        mats.fur.body
+      );
+      legMesh.position.y = 0.19;
+      registerMesh(legMesh, 'forelegs');
+      leg.add(legMesh);
 
-      const earGeom = new THREE.CylinderGeometry(0.15, 0.19, 0.85, 20, 10, true, -Math.PI*0.4, Math.PI*1.8);
-      earGeom.scale(1.0, 1.0, 0.65);
-      const earMesh = new THREE.Mesh(earGeom, materials.chinchilla.ears);
-      earMesh.position.y = 0.42;
-      earMesh.castShadow = true;
-      earGroup.add(earMesh);
-      meshCatalog.ears.push(earMesh);
+      // Front paw
+      const pawMesh = new THREE.Mesh(
+        new THREE.SphereGeometry(0.1, 20, 18),
+        mats.fur.white
+      );
+      pawMesh.position.set(0, 0.05, 0.07);
+      pawMesh.scale.set(0.85, 0.55, 1.35);
+      registerMesh(pawMesh, 'forelegs');
+      leg.add(pawMesh);
 
-      const capGeom = new THREE.SphereGeometry(0.15, 16, 12);
-      capGeom.scale(1.0, 0.8, 0.65);
-      const capMesh = new THREE.Mesh(capGeom, materials.chinchilla.earTip);
-      capMesh.position.y = 0.82;
-      earGroup.add(capMesh);
-      meshCatalog.earTip.push(capMesh);
+      leg.position.set(sign * 0.11, 0.04, 0.32);
+      leg.rotation.x = -0.05;
+      return leg;
+    }
+    rabbitRoot.add(buildForeleg(true));
+    rabbitRoot.add(buildForeleg(false));
 
-      const innerGeom = new THREE.PlaneGeometry(0.18, 0.65);
-      const innerMesh = new THREE.Mesh(innerGeom, materials.chinchilla.earInner);
-      innerMesh.position.set(0, 0.42, 0.02);
-      innerMesh.rotation.y = Math.PI;
-      earGroup.add(innerMesh);
-      meshCatalog.earInner.push(innerMesh);
+    // Hind toes peeking beside front paws
+    const hindFootGeo = new THREE.SphereGeometry(0.09, 20, 16);
+    hindFootGeo.scale(0.88, 0.5, 1.4);
 
-      headGroup.add(earGroup);
-    });
+    const rightHindFoot = new THREE.Mesh(hindFootGeo, mats.fur.white);
+    rightHindFoot.position.set(0.29, 0.045, 0.22);
+    rightHindFoot.rotation.y = 0.22;
+    registerMesh(rightHindFoot, 'feet');
+    rabbitRoot.add(rightHindFoot);
 
-    // Thighs
-    [-1, 1].forEach(side => {
-      const thighGeom = new THREE.SphereGeometry(0.68, 28, 22);
-      thighGeom.scale(0.85, 1.15, 1.35);
-      const thighMesh = new THREE.Mesh(thighGeom, materials.chinchilla.body);
-      thighMesh.position.set(side * 0.72, 0.65, -0.28);
-      thighMesh.rotation.y = side * 0.18;
-      thighMesh.rotation.z = -side * 0.12;
-      thighMesh.castShadow = true;
-      thighMesh.receiveShadow = true;
-      rabbitGroup.add(thighMesh);
-      meshCatalog.thighs.push(thighMesh);
+    const leftHindFoot = new THREE.Mesh(hindFootGeo, mats.fur.white);
+    leftHindFoot.position.set(-0.29, 0.045, 0.22);
+    leftHindFoot.rotation.y = -0.22;
+    registerMesh(leftHindFoot, 'feet');
+    rabbitRoot.add(leftHindFoot);
 
-      const footGeom = new THREE.BoxGeometry(0.24, 0.18, 0.7);
-      const footMesh = new THREE.Mesh(footGeom, materials.chinchilla.paws);
-      footMesh.position.set(side * 0.62, 0.12, 0.32);
-      footMesh.rotation.y = -side * 0.08;
-      footMesh.castShadow = true;
-      rabbitGroup.add(footMesh);
-      meshCatalog.hindFeet.push(footMesh);
-    });
+    /* 8. TAIL (Compact upright fluffy ball) */
+    const tailMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(0.13, 24, 20),
+      mats.fur.white
+    );
+    tailMesh.position.set(0, 0.42, -0.66);
+    tailMesh.scale.set(0.8, 1.1, 0.9);
+    tailMesh.rotation.x = 0.35;
+    registerMesh(tailMesh, 'tail');
+    rabbitRoot.add(tailMesh);
 
-    // Front Legs & Paws
-    [-1, 1].forEach(side => {
-      const legGeom = new THREE.CylinderGeometry(0.13, 0.14, 0.65, 18);
-      const legMesh = new THREE.Mesh(legGeom, materials.chinchilla.body);
-      legMesh.position.set(side * 0.19, 0.42, 0.45);
-      legMesh.rotation.x = -0.08;
-      legMesh.castShadow = true;
-      rabbitGroup.add(legMesh);
-      meshCatalog.frontLegs.push(legMesh);
-
-      const pawGeom = new THREE.BoxGeometry(0.18, 0.12, 0.32);
-      const pawMesh = new THREE.Mesh(pawGeom, materials.chinchilla.paws);
-      pawMesh.position.set(side * 0.19, 0.08, 0.58);
-      pawMesh.castShadow = true;
-      rabbitGroup.add(pawMesh);
-      meshCatalog.frontPaws.push(pawMesh);
-    });
-
-    // Tail
-    const tailGeom = new THREE.ConeGeometry(0.22, 0.42, 20);
-    tailGeom.scale(1.0, 1.0, 0.8);
-    const tailMesh = new THREE.Mesh(tailGeom, materials.chinchilla.chest);
-    tailMesh.position.set(0, 0.48, -1.05);
-    tailMesh.rotation.x = -Math.PI * 0.75;
-    tailMesh.castShadow = true;
-    rabbitGroup.add(tailMesh);
-    meshCatalog.tail.push(tailMesh);
-
-    // Green Cushion Mat
+    /* 9. GREEN LEAF CUSHION PAD (Reference Photo Grounding Mat) */
     const cushionGroup = new THREE.Group();
+    cushionGroup.position.set(0, 0, 0);
     scene.add(cushionGroup);
 
-    const cushionMat = new THREE.MeshStandardMaterial({ color: 0x489634, roughness: 0.9, metalness: 0.02 });
-    const cushionRimMat = new THREE.MeshStandardMaterial({ color: 0x367325, roughness: 0.85 });
+    // Oval green cushion
+    const cushionMesh = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.96, 1.05, 0.09, 42),
+      new THREE.MeshStandardMaterial({
+        color: 0x3f8a32,
+        roughness: 0.85,
+        metalness: 0.02
+      })
+    );
+    cushionMesh.scale.set(1.0, 1.0, 1.25);
+    cushionMesh.position.y = -0.045;
+    cushionMesh.receiveShadow = true;
+    cushionGroup.add(cushionMesh);
 
-    const cushionBaseGeom = new THREE.CylinderGeometry(1.65, 1.75, 0.14, 40);
-    cushionBaseGeom.scale(1.0, 1.0, 1.18);
-    const cushionBase = new THREE.Mesh(cushionBaseGeom, cushionMat);
-    cushionBase.position.y = -0.07;
-    cushionBase.receiveShadow = true;
-    cushionGroup.add(cushionBase);
+    // Cushion rolled border rim
+    const seamMesh = new THREE.Mesh(
+      new THREE.TorusGeometry(0.98, 0.025, 16, 42),
+      new THREE.MeshStandardMaterial({ color: 0x2e6524, roughness: 0.9 })
+    );
+    seamMesh.rotateX(Math.PI / 2);
+    seamMesh.scale.set(1.0, 1.25, 1.0);
+    seamMesh.position.y = -0.02;
+    cushionGroup.add(seamMesh);
 
-    const rimGeom = new THREE.TorusGeometry(1.68, 0.08, 16, 48);
-    rimGeom.scale(1.0, 1.18, 0.8);
-    rimGeom.rotateX(Math.PI * 0.5);
-    const rimMesh = new THREE.Mesh(rimGeom, cushionRimMat);
-    rimMesh.position.y = 0.0;
-    cushionGroup.add(rimMesh);
-
-    const stemGeom = new THREE.CylinderGeometry(0.06, 0.08, 0.45, 12);
-    stemGeom.rotateZ(Math.PI * 0.35);
-    const stemMesh = new THREE.Mesh(stemGeom, cushionRimMat);
-    stemMesh.position.set(-1.75, 0.02, -0.6);
-    cushionGroup.add(stemMesh);
-
-    // Floor & Helpers
-    const planeGeom = new THREE.PlaneGeometry(25, 25);
-    const planeMat = new THREE.ShadowMaterial({ opacity: 0.35 });
-    const shadowPlane = new THREE.Mesh(planeGeom, planeMat);
-    shadowPlane.rotation.x = -Math.PI * 0.5;
-    shadowPlane.position.y = -0.141;
-    shadowPlane.receiveShadow = true;
-    scene.add(shadowPlane);
-
-    const gridHelper = new THREE.GridHelper(12, 24, 0x556070, 0x28303e);
-    gridHelper.position.y = -0.14;
-    scene.add(gridHelper);
-
-    const symGeom = new THREE.PlaneGeometry(3.2, 3.0);
-    const symMat = new THREE.MeshBasicMaterial({ color: 0x33bbff, transparent: true, opacity: 0.18, side: THREE.DoubleSide });
-    const symPlane = new THREE.Mesh(symGeom, symMat);
-    symPlane.rotation.y = Math.PI * 0.5;
-    symPlane.position.set(0, 1.2, 0);
-    symPlane.visible = false;
-    scene.add(symPlane);
-
-    // --- 6. Anatomy Pins ---
-    const anatomyPins = [
-      { id: 1, name: "1. 耳（直立短耳）", pos: new THREE.Vector3(0, 2.3, 0.38), camPos: new THREE.Vector3(0.5, 2.3, 1.6), target: new THREE.Vector3(0, 1.9, 0.4) },
-      { id: 2, name: "2. クラウン・頭部", pos: new THREE.Vector3(0, 1.85, 0.75), camPos: new THREE.Vector3(0, 1.6, 2.2), target: new THREE.Vector3(0, 1.35, 0.5) },
-      { id: 3, name: "3. 側面の大きな目", pos: new THREE.Vector3(0.68, 1.4, 0.72), camPos: new THREE.Vector3(1.8, 1.4, 1.6), target: new THREE.Vector3(0.3, 1.35, 0.4) },
-      { id: 4, name: "4. 首元・胸肉", pos: new THREE.Vector3(0, 1.0, 0.85), camPos: new THREE.Vector3(0, 0.9, 2.4), target: new THREE.Vector3(0, 0.9, 0.4) },
-      { id: 5, name: "5. 背中のCカーブ", pos: new THREE.Vector3(0, 1.75, -0.35), camPos: new THREE.Vector3(2.5, 1.6, -0.2), target: new THREE.Vector3(0, 1.2, -0.2) },
-      { id: 6, name: "6. 揃った前足", pos: new THREE.Vector3(0, 0.25, 0.85), camPos: new THREE.Vector3(0.6, 0.4, 2.0), target: new THREE.Vector3(0, 0.2, 0.5) },
-      { id: 7, name: "7. 大腿筋塊・太もも", pos: new THREE.Vector3(0.95, 0.7, -0.25), camPos: new THREE.Vector3(2.4, 0.9, 0.6), target: new THREE.Vector3(0.4, 0.6, -0.2) },
-      { id: 8, name: "8. 尻尾の収まり", pos: new THREE.Vector3(0, 0.5, -1.35), camPos: new THREE.Vector3(0, 0.8, -2.5), target: new THREE.Vector3(0, 0.5, -0.8) }
-    ];
+    // Workshop Grid underneath
+    const grid = new THREE.GridHelper(5, 20, 0xf59e0b, 0x1e293b);
+    grid.position.y = -0.091;
+    scene.add(grid);
 
     const pinElements = [];
-    anatomyPins.forEach(p => {
+
+    ANATOMY_ITEMS.forEach(item => {
       const el = document.createElement('div');
-      el.className = 'pin-label';
-      el.textContent = p.name;
-      el.addEventListener('click', () => focusPin(p));
-      pinsContainer.appendChild(el);
-      pinElements.push({ data: p, el: el });
+      el.className = 'pin-label w-6 h-6 rounded-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs flex items-center justify-center shadow-lg shadow-amber-500/50 border-2 border-white select-none';
+      el.innerText = item.num;
+      el.setAttribute('title', item.name);
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showAnatomyDetail(item);
+      });
+      pinsOverlay.appendChild(el);
+
+      pinElements.push({
+        element: el,
+        worldPos: new THREE.Vector3(...item.pos)
+      });
     });
 
-    function updatePins() {
-      if (!document.getElementById('toggle-pins').checked) {
-        pinsContainer.style.display = 'none';
-        return;
-      }
-      pinsContainer.style.display = 'block';
+    // Populate Sidebar Anatomy List
+    const anatomyList = document.getElementById('anatomy-list');
+    ANATOMY_ITEMS.forEach(item => {
+      const row = document.createElement('button');
+      row.className = 'w-full text-left p-1.5 rounded-lg bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 transition flex items-center gap-2 group';
+      row.innerHTML = `
+        <span class="w-4 h-4 rounded-full bg-slate-800 group-hover:bg-amber-500 text-slate-300 group-hover:text-slate-950 font-bold text-[10px] flex items-center justify-center shrink-0 transition">
+          ${item.num}
+        </span>
+        <div class="truncate">
+          <div class="font-semibold text-slate-200 group-hover:text-amber-300 text-[11px] truncate">${item.name}</div>
+          <div class="text-[9px] text-slate-500 truncate">${item.sub}</div>
+        </div>
+      `;
+      row.addEventListener('click', () => showAnatomyDetail(item));
+      anatomyList.appendChild(row);
+    });
 
-      const tempV = new THREE.Vector3();
-      const halfW = container.clientWidth * 0.5;
-      const halfH = container.clientHeight * 0.5;
+    // Smooth Camera Animation helper
+    let isTweening = false;
+    function smoothMoveCamera(camTargetPos, lookAtPos, duration = 900) {
+      isTweening = true;
+      const startPos = camera.position.clone();
+      const endPos = new THREE.Vector3(...camTargetPos);
+      const startTarget = controls.target.clone();
+      const endTarget = new THREE.Vector3(...lookAtPos);
+      const startTime = performance.now();
+
+      function step(now) {
+        const elapsed = now - startTime;
+        let t = Math.min(1, elapsed / duration);
+        // Cubic ease in-out
+        t = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+        camera.position.lerpVectors(startPos, endPos, t);
+        controls.target.lerpVectors(startTarget, endTarget, t);
+        controls.update();
+
+        if (elapsed < duration) {
+          requestAnimationFrame(step);
+        } else {
+          isTweening = false;
+        }
+      }
+      requestAnimationFrame(step);
+    }
+
+    // Detail Card Controls
+    const pinCard = document.getElementById('pin-card');
+    const cardNum = document.getElementById('card-num');
+    const cardName = document.getElementById('card-name');
+    const cardSub = document.getElementById('card-sub');
+    const cardDesc = document.getElementById('card-desc');
+    const cardTip = document.getElementById('card-tip');
+    const cardClose = document.getElementById('card-close-btn');
+
+    function showAnatomyDetail(item) {
+      smoothMoveCamera(item.camPos, item.lookAt);
+      cardNum.textContent = item.num;
+      cardName.textContent = item.name;
+      cardSub.textContent = item.sub;
+      cardDesc.innerHTML = `<b class="text-amber-400 block mb-0.5">【構造の特徴】</b>${item.desc}`;
+      cardTip.innerHTML = `${item.tip}`;
+
+      pinCard.classList.remove('translate-y-36', 'opacity-0', 'pointer-events-none');
+    }
+
+    cardClose.addEventListener('click', () => {
+      pinCard.classList.add('translate-y-36', 'opacity-0', 'pointer-events-none');
+    });
+
+    // Material Switcher Logic
+    const matButtons = document.querySelectorAll('.mat-btn');
+    matButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        matButtons.forEach(b => {
+          b.classList.remove('bg-amber-600', 'text-white', 'active');
+          b.classList.add('bg-slate-800', 'text-slate-300');
+        });
+        btn.classList.remove('bg-slate-800', 'text-slate-300');
+        btn.classList.add('bg-amber-600', 'text-white', 'active');
+
+        applyMaterialMode(btn.dataset.mode);
+      });
+    });
+
+    function applyMaterialMode(mode) {
+      const isWire = document.getElementById('chk-wire').checked;
+
+      rabbitMeshRegistry.forEach(({ mesh, category }) => {
+        let mat;
+        if (mode === 'fur') {
+          if (category === 'eyes') mat = mats.fur.eye;
+          else if (category === 'ears' && mesh.geometry.parameters && mesh.geometry.parameters.radius === 0.11) mat = mats.fur.earInner;
+          else if (category === 'ears' && mesh.geometry.parameters && mesh.geometry.parameters.radius === 0.088) mat = mats.fur.earRim;
+          else if (category === 'tail' || mesh === chestBib || category === 'feet') mat = mats.fur.white;
+          else if (mesh === noseMesh) mat = mats.fur.nose;
+          else mat = mats.fur.body;
+        } else if (mode === 'clay') {
+          mat = category === 'eyes' ? mats.clay.eye : mats.clay.body;
+        } else if (mode === 'terracotta') {
+          mat = category === 'eyes' ? mats.terracotta.eye : mats.terracotta.body;
+        } else if (mode === 'blockin') {
+          mat = mats.blockin[category] || mats.blockin.torso;
+        }
+
+        mesh.material = mat;
+        mesh.material.wireframe = isWire;
+        mesh.material.needsUpdate = true;
+      });
+    }
+
+    // Checkbox toggles
+    document.getElementById('chk-wire').addEventListener('change', (e) => {
+      rabbitMeshRegistry.forEach(({ mesh }) => {
+        mesh.material.wireframe = e.target.checked;
+      });
+    });
+
+    document.getElementById('chk-cushion').addEventListener('change', (e) => {
+      cushionGroup.visible = e.target.checked;
+    });
+
+    document.getElementById('chk-pins').addEventListener('change', (e) => {
+      pinsOverlay.style.display = e.target.checked ? 'block' : 'none';
+    });
+
+    // Camera Presets
+    const CAM_PRESETS = {
+      photo:  { pos: [2.2, 1.5, 2.1],  target: [0, 0.82, 0.1] },  // matches the 3/4 right photo
+      front:  { pos: [0, 1.1, 2.7],    target: [0, 0.85, 0.15] },
+      right:  { pos: [2.7, 0.95, 0],   target: [0, 0.80, 0] },    // Profile C-curve
+      left:   { pos: [-2.7, 0.95, 0],  target: [0, 0.80, 0] },
+      top:    { pos: [0, 3.2, 0.05],   target: [0, 0.6, 0] },     // Egg silhouette
+      rear:   { pos: [0, 0.95, -2.7],  target: [0, 0.75, -0.1] },
+      bottom: { pos: [0, -2.5, 0.1],   target: [0, 0.4, 0] }
+    };
+
+    document.querySelectorAll('.cam-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const p = CAM_PRESETS[btn.dataset.cam];
+        if (p) smoothMoveCamera(p.pos, p.target);
+      });
+    });
+
+    // Turntable Auto-Rotate
+    let isAutoRotating = false;
+    const btnTurntable = document.getElementById('btn-turntable');
+    const turntableText = document.getElementById('turntable-text');
+    btnTurntable.addEventListener('click', () => {
+      isAutoRotating = !isAutoRotating;
+      controls.autoRotate = isAutoRotating;
+      controls.autoRotateSpeed = 2.0;
+      turntableText.textContent = `回転: ${isAutoRotating ? 'ON' : 'OFF'}`;
+      btnTurntable.classList.toggle('border-amber-500', isAutoRotating);
+      btnTurntable.classList.toggle('text-amber-400', isAutoRotating);
+    });
+
+    // Sculptor Raking Light Sliders
+    const slAz = document.getElementById('slider-light-az');
+    const slEl = document.getElementById('slider-light-el');
+    const lblAz = document.getElementById('lbl-light-az');
+    const lblEl = document.getElementById('lbl-light-el');
+
+    function updateRakingLight() {
+      const az = THREE.MathUtils.degToRad(parseFloat(slAz.value));
+      const el = THREE.MathUtils.degToRad(parseFloat(slEl.value));
+      const dist = 3.6;
+
+      const lx = dist * Math.cos(el) * Math.sin(az);
+      const ly = dist * Math.sin(el);
+      const lz = dist * Math.cos(el) * Math.cos(az);
+
+      keyLight.position.set(lx, ly, lz);
+      lblAz.textContent = `${slAz.value}°`;
+      lblEl.textContent = `${slEl.value}°`;
+    }
+    slAz.addEventListener('input', updateRakingLight);
+    slEl.addEventListener('input', updateRakingLight);
+
+    // Slicer Slider
+    const chkSlicer = document.getElementById('chk-slicer');
+    const slSlicer = document.getElementById('slider-slicer');
+    const lblSlicer = document.getElementById('lbl-slice-val');
+
+    chkSlicer.addEventListener('change', (e) => {
+      slSlicer.disabled = !e.target.checked;
+      slSlicer.classList.toggle('opacity-40', !e.target.checked);
+      if (!e.target.checked) {
+        clipPlane.constant = 5.0;
+        lblSlicer.textContent = '100%';
+      } else {
+        updateSlicer();
+      }
+    });
+
+    function updateSlicer() {
+      const pct = parseFloat(slSlicer.value);
+      // Map 0 - 100% to Y height (-0.1 to 2.1)
+      const h = -0.1 + (pct / 100) * 2.2;
+      clipPlane.constant = h;
+      lblSlicer.textContent = `${pct}%`;
+    }
+    slSlicer.addEventListener('input', updateSlicer);
+
+    // PNG Snapshot
+    document.getElementById('btn-snapshot').addEventListener('click', () => {
+      pinsOverlay.style.display = 'none';
+      renderer.render(scene, camera);
+
+      const link = document.createElement('a');
+      link.download = `netherland-dwarf-sculpt-${Date.now()}.png`;
+      link.href = renderer.domElement.toDataURL('image/png');
+      link.click();
+
+      if (document.getElementById('chk-pins').checked) {
+        pinsOverlay.style.display = 'block';
+      }
+    });
+
+    // Mobile sidebar toggle
+    const btnSidebar = document.getElementById('btn-toggle-sidebar');
+    const sidebar = document.getElementById('sidebar');
+    btnSidebar.addEventListener('click', () => {
+      sidebar.classList.toggle('-translate-x-[110%]');
+    });
+
+    // Window Resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // 3D Pin screen projection
+    const tempV = new THREE.Vector3();
+    function updatePins() {
+      if (!document.getElementById('chk-pins').checked) return;
+      const w2 = window.innerWidth / 2;
+      const h2 = window.innerHeight / 2;
 
       pinElements.forEach(item => {
-        tempV.copy(item.data.pos);
+        tempV.copy(item.worldPos);
         tempV.project(camera);
 
         if (tempV.z > 1) {
-          item.el.style.display = 'none';
+          item.element.style.display = 'none';
           return;
         }
-
-        const x = (tempV.x * halfW) + halfW;
-        const y = -(tempV.y * halfH) + halfH;
-        item.el.style.display = 'block';
-        item.el.style.left = `${x}px`;
-        item.el.style.top = `${y}px`;
+        item.element.style.display = 'flex';
+        const sx = (tempV.x * w2) + w2;
+        const sy = -(tempV.y * h2) + h2;
+        item.element.style.left = `${sx}px`;
+        item.element.style.top = `${sy}px`;
       });
     }
 
-    // --- 7. Material Modes ---
-    function setRenderMode(mode) {
-      document.querySelectorAll('.mode-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.getAttribute('data-mode') === mode);
-      });
+    // Subtle gentle breathing animation
+    const clock = new THREE.Clock();
 
-      const applyMat = (meshes, mat, wire = false) => {
-        meshes.forEach(m => {
-          m.material = mat;
-          m.material.wireframe = wire;
-        });
-      };
+    function renderLoop() {
+      requestAnimationFrame(renderLoop);
 
-      if (mode === 'chinchilla') {
-        applyMat(meshCatalog.torso, materials.chinchilla.body);
-        applyMat(meshCatalog.head, materials.chinchilla.body);
-        applyMat(meshCatalog.cheeks, materials.chinchilla.body);
-        applyMat(meshCatalog.thighs, materials.chinchilla.body);
-        applyMat(meshCatalog.dewlap, materials.chinchilla.body);
-        applyMat(meshCatalog.chest, materials.chinchilla.chest);
-        applyMat(meshCatalog.tail, materials.chinchilla.chest);
-        applyMat(meshCatalog.frontLegs, materials.chinchilla.body);
-        applyMat(meshCatalog.frontPaws, materials.chinchilla.paws);
-        applyMat(meshCatalog.hindFeet, materials.chinchilla.paws);
-        applyMat(meshCatalog.ears, materials.chinchilla.ears);
-        applyMat(meshCatalog.earInner, materials.chinchilla.earInner);
-        applyMat(meshCatalog.earTip, materials.chinchilla.earTip);
-        applyMat(meshCatalog.eyes, materials.chinchilla.eye);
-        applyMat(meshCatalog.eyeRings, materials.chinchilla.eyeRing);
-        applyMat(meshCatalog.nose, materials.chinchilla.nose);
-      } else if (mode === 'clay') {
-        Object.values(meshCatalog).flat().forEach(m => {
-          m.material = materials.clay;
-          m.material.wireframe = false;
-        });
-      } else if (mode === 'terracotta') {
-        Object.values(meshCatalog).flat().forEach(m => {
-          m.material = materials.terracotta;
-          m.material.wireframe = false;
-        });
-      } else if (mode === 'paperclay') {
-        Object.values(meshCatalog).flat().forEach(m => {
-          m.material = materials.paperclay;
-          m.material.wireframe = false;
-        });
-      } else if (mode === 'wireframe') {
-        Object.values(meshCatalog).flat().forEach(m => {
-          m.material = materials.clay;
-          m.material.wireframe = true;
-        });
-      } else if (mode === 'blocking') {
-        applyMat(meshCatalog.torso, materials.blocking.torso);
-        applyMat(meshCatalog.head, materials.blocking.head);
-        applyMat(meshCatalog.cheeks, materials.blocking.cheeks);
-        applyMat(meshCatalog.ears, materials.blocking.ears);
-        applyMat(meshCatalog.earInner, materials.blocking.ears);
-        applyMat(meshCatalog.earTip, materials.blocking.ears);
-        applyMat(meshCatalog.eyes, materials.chinchilla.eye);
-        applyMat(meshCatalog.eyeRings, materials.blocking.head);
-        applyMat(meshCatalog.nose, materials.blocking.cheeks);
-        applyMat(meshCatalog.dewlap, materials.blocking.dewlap);
-        applyMat(meshCatalog.chest, materials.blocking.dewlap);
-        applyMat(meshCatalog.thighs, materials.blocking.thighs);
-        applyMat(meshCatalog.frontLegs, materials.blocking.frontLegs);
-        applyMat(meshCatalog.frontPaws, materials.blocking.paws);
-        applyMat(meshCatalog.hindFeet, materials.blocking.hindFeet);
-        applyMat(meshCatalog.tail, materials.blocking.tail);
-      }
-    }
-
-    document.querySelectorAll('.mode-btn').forEach(btn => {
-      btn.addEventListener('click', () => setRenderMode(btn.getAttribute('data-mode')));
-    });
-
-    // --- 8. Presets & Animation ---
-    let targetCamPos = null;
-    let targetLookAt = null;
-
-    function animateCameraTo(camPos, lookAt) {
-      targetCamPos = camPos.clone();
-      targetLookAt = lookAt.clone();
-    }
-
-    const viewPresets = {
-      photo: { cam: new THREE.Vector3(2.5, 1.45, 1.7), target: new THREE.Vector3(0, 0.95, 0.1) },
-      front: { cam: new THREE.Vector3(0, 1.2, 3.2), target: new THREE.Vector3(0, 0.95, 0.3) },
-      right: { cam: new THREE.Vector3(3.2, 1.1, 0), target: new THREE.Vector3(0, 0.95, 0) },
-      left: { cam: new THREE.Vector3(-3.2, 1.1, 0), target: new THREE.Vector3(0, 0.95, 0) },
-      back: { cam: new THREE.Vector3(0, 1.3, -3.2), target: new THREE.Vector3(0, 0.95, -0.1) },
-      top: { cam: new THREE.Vector3(0, 4.0, 0.01), target: new THREE.Vector3(0, 0.8, 0) },
-      bottom: { cam: new THREE.Vector3(0, -2.8, 0.01), target: new THREE.Vector3(0, 0.6, 0) },
-      quarter: { cam: new THREE.Vector3(2.3, 1.6, 2.3), target: new THREE.Vector3(0, 0.95, 0.1) }
-    };
-
-    document.querySelectorAll('.preset-btn[data-view]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const viewKey = btn.getAttribute('data-view');
-        const p = viewPresets[viewKey];
-        if (p) {
-          animateCameraTo(p.cam, p.target);
-          document.querySelectorAll('.preset-btn[data-view]').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-        }
-      });
-    });
-
-    let isTurntable = false;
-    const btnTurntable = document.getElementById('btn-turntable');
-    btnTurntable.addEventListener('click', () => {
-      isTurntable = !isTurntable;
-      btnTurntable.classList.toggle('active', isTurntable);
-      controls.autoRotate = isTurntable;
-      controls.autoRotateSpeed = 1.8;
-    });
-
-    document.getElementById('btn-reset-cam').addEventListener('click', () => {
-      animateCameraTo(viewPresets.photo.cam, viewPresets.photo.target);
-      controls.autoRotate = false;
-      btnTurntable.classList.remove('active');
-    });
-
-    function focusPin(pin) {
-      animateCameraTo(pin.camPos, pin.target);
-      document.querySelectorAll('.point-card').forEach(card => {
-        const match = card.getAttribute('data-pin') == pin.id;
-        card.classList.toggle('active', match);
-        if (match) {
-          card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-      });
-      switchTab('tab-anatomy');
-    }
-
-    document.querySelectorAll('.point-card').forEach(card => {
-      card.addEventListener('click', () => {
-        const pinId = parseInt(card.getAttribute('data-pin'));
-        const pin = anatomyPins.find(p => p.id === pinId);
-        if (pin) focusPin(pin);
-      });
-    });
-
-    // --- 9. Tabs ---
-    function switchTab(tabId) {
-      document.querySelectorAll('.tab-nav-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
-      });
-      document.querySelectorAll('.tab-pane').forEach(pane => {
-        pane.classList.toggle('active', pane.id === tabId);
-      });
-    }
-
-    document.querySelectorAll('.tab-nav-btn').forEach(btn => {
-      btn.addEventListener('click', () => switchTab(btn.getAttribute('data-tab')));
-    });
-
-    // --- 10. Light & Slicing Events ---
-    const inAzimuth = document.getElementById('light-azimuth');
-    const inElevation = document.getElementById('light-elevation');
-    const inIntensity = document.getElementById('light-intensity');
-    const inAmbient = document.getElementById('light-ambient');
-
-    inAzimuth.addEventListener('input', () => {
-      document.getElementById('val-azimuth').textContent = `${inAzimuth.value}°`;
-      updateLightPosition();
-    });
-    inElevation.addEventListener('input', () => {
-      document.getElementById('val-elevation').textContent = `${inElevation.value}°`;
-      updateLightPosition();
-    });
-    inIntensity.addEventListener('input', () => {
-      document.getElementById('val-intensity').textContent = inIntensity.value;
-      mainLight.intensity = parseFloat(inIntensity.value);
-    });
-    inAmbient.addEventListener('input', () => {
-      document.getElementById('val-ambient').textContent = inAmbient.value;
-      ambientLight.intensity = parseFloat(inAmbient.value);
-    });
-
-    const toggleSlicer = document.getElementById('toggle-slicer');
-    const sliceHeight = document.getElementById('slice-height');
-    const slicerControls = document.getElementById('slicer-controls');
-
-    toggleSlicer.addEventListener('change', () => {
-      const enabled = toggleSlicer.checked;
-      renderer.clippingPlanes = enabled ? [clipPlane] : [];
-      slicerControls.style.opacity = enabled ? '1' : '0.5';
-      slicerControls.style.pointerEvents = enabled ? 'auto' : 'none';
-    });
-
-    sliceHeight.addEventListener('input', () => {
-      const val = parseFloat(sliceHeight.value);
-      document.getElementById('val-slice').textContent = `${val.toFixed(2)}m`;
-      clipPlane.constant = val;
-    });
-
-    document.getElementById('toggle-grid').addEventListener('change', (e) => {
-      gridHelper.visible = e.target.checked;
-      shadowPlane.visible = e.target.checked;
-    });
-    document.getElementById('toggle-cushion').addEventListener('change', (e) => {
-      cushionGroup.visible = e.target.checked;
-    });
-    document.getElementById('toggle-symmetry').addEventListener('change', (e) => {
-      symPlane.visible = e.target.checked;
-    });
-
-    document.getElementById('btn-snapshot').addEventListener('click', () => {
-      renderer.render(scene, camera);
-      const url = renderer.domElement.toDataURL('image/png');
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `netherland_dwarf_clay_reference_${Date.now()}.png`;
-      a.click();
-    });
-
-    window.addEventListener('resize', () => {
-      camera.aspect = container.clientWidth / container.clientHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(container.clientWidth, container.clientHeight);
-    });
-
-    function animate() {
-      requestAnimationFrame(animate);
-
-      if (targetCamPos && targetLookAt) {
-        camera.position.lerp(targetCamPos, 0.08);
-        controls.target.lerp(targetLookAt, 0.08);
-        if (camera.position.distanceTo(targetCamPos) < 0.02 && controls.target.distanceTo(targetLookAt) < 0.02) {
-          targetCamPos = null;
-          targetLookAt = null;
-        }
+      const t = clock.getElapsedTime();
+      if (!isTweening) {
+        controls.update();
       }
 
-      controls.update();
-      renderer.render(scene, camera);
+      // Very subtle organic chest respiration
+      chestMesh.scale.x = 0.9 + Math.sin(t * 1.6) * 0.012;
+      chestMesh.scale.z = 0.95 + Math.sin(t * 1.6) * 0.012;
+
       updatePins();
+      renderer.render(scene, camera);
     }
-    animate();
+
+    window.onload = function() {
+      updateRakingLight();
+      renderLoop();
+
+      setTimeout(() => {
+        const hint = document.getElementById('hint-badge');
+        if (hint) {
+          hint.style.opacity = '0';
+          setTimeout(() => hint.remove(), 1000);
+        }
+      }, 4500);
+    };
   </script>
 </body>
 </html>
